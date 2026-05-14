@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BarChart3, Database, MapPin, Sparkles, Menu, X, ArrowRight } from "lucide-react";
+import { BarChart3, Database, MapPin, Sparkles, Menu, X, ArrowRight, AlertTriangle, Radar, MessageCircle, Send, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/")({
@@ -12,6 +12,7 @@ function Index() {
   const nav = [
     { label: "Início", href: "#inicio" },
     { label: "O Dashboard", href: "#dashboard" },
+    { label: "Radar de Auditoria", href: "#radar" },
     { label: "Como a IA ajuda", href: "#ia" },
     { label: "Sobre o Projeto", href: "#sobre" },
   ];
@@ -68,13 +69,16 @@ function Index() {
               Transparência pública potencializada por IA
             </div>
             <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.05]">
-              Monitor de Emendas
-              <span className="block bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-                Brasil
+              Monitor de Emendas Brasil
+              <span className="mt-3 inline-flex items-center gap-2">
+                <span className="inline-flex items-center px-4 py-1.5 rounded-xl bg-gradient-to-r from-primary to-primary-glow text-primary-foreground text-3xl md:text-5xl font-extrabold shadow-elegant">
+                  SC
+                </span>
+                <span className="text-sm md:text-base font-medium text-muted-foreground">Santa Catarina</span>
               </span>
             </h1>
             <h2 className="mt-6 text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed">
-              Transparência inteligente: decodificando o destino das emendas parlamentares com IA Generativa.
+              Transparência com Auditoria Digital: Monitorando o destino das emendas parlamentares com IA e detecção de anomalias.
             </h2>
             <div className="mt-8 flex flex-wrap gap-4">
               <a
@@ -129,26 +133,91 @@ function Index() {
             </p>
           </div>
 
-          <div className="rounded-3xl bg-card border border-border shadow-elegant overflow-hidden">
-            <div className="flex items-center gap-2 px-5 py-3 border-b border-border bg-secondary/50">
-              <span className="h-3 w-3 rounded-full bg-destructive/50" />
-              <span className="h-3 w-3 rounded-full bg-chart-4/60" />
-              <span className="h-3 w-3 rounded-full bg-accent/60" />
-              <span className="ml-3 text-xs text-muted-foreground font-medium">painel.monitordeemendas.br</span>
-            </div>
-            <div
-              className="relative w-full bg-gradient-to-br from-secondary to-muted flex items-center justify-center"
-              style={{ aspectRatio: "16 / 9" }}
-            >
-              <div className="text-center px-6">
-                <div className="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-card border border-border shadow-soft">
-                  <BarChart3 className="h-8 w-8 text-primary" />
-                </div>
-                <p className="text-sm md:text-base font-medium text-muted-foreground max-w-md mx-auto">
-                  [Área reservada para embed do Power BI — O painel interativo será carregado aqui]
-                </p>
+          <div className="grid lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 rounded-3xl bg-card border border-border shadow-elegant overflow-hidden">
+              <div className="flex items-center gap-2 px-5 py-3 border-b border-border bg-secondary/50">
+                <span className="h-3 w-3 rounded-full bg-destructive/50" />
+                <span className="h-3 w-3 rounded-full bg-chart-4/60" />
+                <span className="h-3 w-3 rounded-full bg-accent/60" />
+                <span className="ml-3 text-xs text-muted-foreground font-medium">painel.monitordeemendas.br/sc</span>
+              </div>
+              <div className="relative w-full bg-muted" style={{ aspectRatio: "16 / 9" }}>
+                <iframe
+                  title="Dashboard Power BI - Monitor de Emendas SC"
+                  src="about:blank"
+                  className="absolute inset-0 w-full h-full border-0"
+                  allowFullScreen
+                />
               </div>
             </div>
+
+            {/* Chat Investigativo */}
+            <aside className="rounded-3xl bg-card border border-border shadow-elegant overflow-hidden flex flex-col">
+              <div className="flex items-center gap-3 px-5 py-4 border-b border-border bg-secondary/50">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary-glow text-primary-foreground">
+                  <MessageCircle className="h-4 w-4" />
+                </span>
+                <div>
+                  <h3 className="text-sm font-semibold tracking-tight">Consultoria de Transparência</h3>
+                  <p className="text-xs text-muted-foreground">Pergunte diretamente à base de dados</p>
+                </div>
+              </div>
+              <div className="flex-1 p-5 space-y-3 min-h-[280px] bg-gradient-to-b from-transparent to-secondary/20">
+                <div className="max-w-[90%] text-sm bg-secondary text-foreground rounded-2xl rounded-tl-sm px-4 py-2.5">
+                  Olá! Faça perguntas como: <em>"Quais emendas chegaram em Florianópolis em 2025?"</em>
+                </div>
+              </div>
+              <form className="border-t border-border p-3 flex items-center gap-2 bg-card" onSubmit={(e) => e.preventDefault()}>
+                <input
+                  type="text"
+                  placeholder="Pergunte sobre uma emenda, parlamentar ou município..."
+                  className="flex-1 bg-secondary/60 border border-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+                <button type="submit" className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground hover:opacity-95 transition" aria-label="Enviar">
+                  <Send className="h-4 w-4" />
+                </button>
+              </form>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      {/* Radar de Auditoria */}
+      <section id="radar" className="py-16 md:py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <Radar className="h-6 w-6 text-accent" />
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-accent/10 text-accent border border-accent/20 uppercase tracking-wider">Beta</span>
+          </div>
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Radar de Auditoria</h2>
+            <p className="mt-3 text-muted-foreground">
+              O cão de guarda digital: nossa IA varre portais oficiais e notícias em tempo real para sinalizar movimentações suspeitas.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            {[
+              { icon: AlertTriangle, tag: "Anomalia", color: "text-destructive", border: "border-destructive/30", bg: "bg-destructive/5" },
+              { icon: ShieldAlert, tag: "Insight", color: "text-chart-4", border: "border-chart-4/30", bg: "bg-chart-4/5" },
+              { icon: Radar, tag: "Monitorando", color: "text-accent", border: "border-accent/30", bg: "bg-accent/5" },
+            ].map((card, i) => (
+              <div key={i} className={`relative p-6 rounded-2xl border ${card.border} ${card.bg} backdrop-blur-sm`}>
+                <div className="flex items-center justify-between mb-4">
+                  <span className={`inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider ${card.color}`}>
+                    <card.icon className="h-4 w-4" />
+                    {card.tag}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                    <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
+                    Ao vivo
+                  </span>
+                </div>
+                <p className="text-sm text-foreground/80 leading-relaxed">
+                  [Aguardando dados... A IA está varrendo portais de transparência e notícias para identificar possíveis anomalias neste parlamentar/município.]
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
