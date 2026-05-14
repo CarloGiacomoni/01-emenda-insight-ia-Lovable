@@ -133,8 +133,8 @@ function Index() {
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 rounded-3xl bg-card border border-border shadow-elegant overflow-hidden">
+          <div className="space-y-10 md:space-y-14">
+            <div className="rounded-3xl bg-card border border-border shadow-elegant overflow-hidden">
               <div className="flex items-center gap-2 px-5 py-3 border-b border-border bg-secondary/50">
                 <span className="h-3 w-3 rounded-full bg-destructive/50" />
                 <span className="h-3 w-3 rounded-full bg-chart-4/60" />
@@ -152,7 +152,7 @@ function Index() {
             </div>
 
             {/* Chat Investigativo */}
-            <aside className="rounded-3xl bg-card border border-border shadow-elegant overflow-hidden flex flex-col">
+            <aside className="mx-auto w-full max-w-3xl rounded-3xl bg-card border border-border shadow-elegant overflow-hidden flex flex-col">
               <div className="flex items-center gap-3 px-5 py-4 border-b border-border bg-secondary/50">
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary-glow text-primary-foreground">
                   <MessageCircle className="h-4 w-4" />
