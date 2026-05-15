@@ -2,12 +2,65 @@ import { createFileRoute } from "@tanstack/react-router";
 import { BarChart3, Database, MapPin, Sparkles, Menu, X, ArrowRight, AlertTriangle, Radar, MessageCircle, Send, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 
+type ChatMessage = { role: "user" | "bot" | "system"; text: string; pending?: boolean };
+
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
 function Index() {
   const [open, setOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { role: "bot", text: 'Olá! Faça perguntas como: "Quais emendas chegaram em Florianópolis em 2025?"' },
+  ]);
+  const [sending, setSending] = useState(false);
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const pergunta = input.trim();
+    if (!pergunta || sending) return;
+
+    setInput("");
+    setSending(true);
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", text: pergunta },
+      { role: "bot", text: "Pensando...", pending: true },
+    ]);
+
+    try {
+      const res = await fetch("http://localhost:5678/webhook-test/chat-auditoria", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pergunta }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const contentType = res.headers.get("content-type") ?? "";
+      const data = contentType.includes("application/json") ? await res.json() : await res.text();
+      const reply =
+        typeof data === "string"
+          ? data
+          : data?.resposta ?? data?.answer ?? data?.message ?? data?.output ?? JSON.stringify(data);
+      setMessages((prev) => {
+        const next = prev.filter((m) => !m.pending);
+        return [...next, { role: "bot", text: String(reply) }];
+      });
+    } catch (err) {
+      setMessages((prev) => {
+        const next = prev.filter((m) => !m.pending);
+        return [
+          ...next,
+          {
+            role: "system",
+            text: "Não foi possível conectar à Consultoria de Transparência. Verifique sua conexão e tente novamente.",
+          },
+        ];
+      });
+    } finally {
+      setSending(false);
+    }
+  };
 
   const nav = [
     { label: "Início", href: "#inicio" },
@@ -164,17 +217,44 @@ function Index() {
                 </div>
               </div>
               <div className="flex-1 p-5 space-y-3 min-h-[280px] bg-gradient-to-b from-transparent to-secondary/20">
-                <div className="max-w-[90%] text-sm bg-secondary text-foreground rounded-2xl rounded-tl-sm px-4 py-2.5">
-                  Olá! Faça perguntas como: <em>"Quais emendas chegaram em Florianópolis em 2025?"</em>
-                </div>
+                {messages.map((m, i) => {
+                  const base = "max-w-[90%] text-sm rounded-2xl px-4 py-2.5 whitespace-pre-wrap";
+                  if (m.role === "user") {
+                    return (
+                      <div key={i} className={`${base} ml-auto bg-primary text-primary-foreground rounded-tr-sm`}>
+                        {m.text}
+                      </div>
+                    );
+                  }
+                  if (m.role === "system") {
+                    return (
+                      <div key={i} className={`${base} bg-destructive/10 text-destructive border border-destructive/20 rounded-tl-sm`}>
+                        {m.text}
+                      </div>
+                    );
+                  }
+                  return (
+                    <div key={i} className={`${base} bg-secondary text-foreground rounded-tl-sm ${m.pending ? "italic opacity-70" : ""}`}>
+                      {m.text}
+                    </div>
+                  );
+                })}
               </div>
-              <form className="border-t border-border p-3 flex items-center gap-2 bg-card" onSubmit={(e) => e.preventDefault()}>
+              <form className="border-t border-border p-3 flex items-center gap-2 bg-card" onSubmit={handleSend}>
                 <input
                   type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  disabled={sending}
                   placeholder="Pergunte sobre uma emenda, parlamentar ou município..."
-                  className="flex-1 bg-secondary/60 border border-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  className="flex-1 bg-secondary/60 border border-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-60"
                 />
-                <button type="submit" className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground hover:opacity-95 transition" aria-label="Enviar">
+                <button
+                  type="submit"
+                  disabled={sending || !input.trim()}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground hover:opacity-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Enviar"
+                >
                   <Send className="h-4 w-4" />
                 </button>
               </form>
