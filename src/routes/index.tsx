@@ -141,11 +141,11 @@ function Index() {
                 <span className="h-3 w-3 rounded-full bg-accent/60" />
                 <span className="ml-3 text-xs text-muted-foreground font-medium">painel.monitordeemendas.br/sc</span>
               </div>
-              <div className="relative w-full bg-muted min-h-[85vh]">
+              <div className="relative w-full bg-muted aspect-video">
                 <iframe
                   title="Dashboard Power BI - Monitor de Emendas SC"
                   src="https://app.powerbi.com/view?r=eyJrIjoiOTBmMWRhNzItZmM0Zi00Zjg4LWJhYWMtMzViMmVmYzNmZGVkIiwidCI6ImQ2YjQ0ZTk0LWJiMDktNGE1Ni05ZjMxLWJlYmVjYmFhMmQ0ZCJ9"
-                  className="absolute inset-0 w-full h-full"
+                  className="w-full h-full"
                   style={{ border: 0 }}
                   allowFullScreen
                 />
