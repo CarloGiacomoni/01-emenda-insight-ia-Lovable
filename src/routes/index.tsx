@@ -30,7 +30,7 @@ function Index() {
     ]);
 
     try {
-      const res = await fetch("https://813fdd0e103c91.lhr.life/webhook-test/chat-auditoria", {
+      const res = await fetch("https://35549bff8e16fa.lhr.life/webhook-test/chat-auditoria", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pergunta }),
