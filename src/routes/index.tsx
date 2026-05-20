@@ -15,6 +15,7 @@ function Index() {
     { role: "bot", text: 'Olá! Faça perguntas como: "Quais emendas chegaram em Florianópolis em 2025?"' },
   ]);
   const [sending, setSending] = useState(false);
+  const [parlamentarSelecionado, setParlamentarSelecionado] = useState<string | null>(null);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,10 +31,15 @@ function Index() {
     ]);
 
     try {
-      const res = await fetch("https://35549bff8e16fa.lhr.life/webhook-test/chat-auditoria", {
+      const res = await fetch("https://71c75b45b4fca2.lhr.life/webhook-test/chat-auditoria", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pergunta }),
+        body: JSON.stringify({
+          mensagem_usuario: pergunta,
+          contexto_painel: {
+            parlamentar_selecionado: parlamentarSelecionado,
+          },
+        }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const contentType = res.headers.get("content-type") ?? "";
