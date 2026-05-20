@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BarChart3, Database, MapPin, Sparkles, Menu, X, ArrowRight, AlertTriangle, Radar, MessageCircle, Send, ShieldAlert } from "lucide-react";
+import { BarChart3, Database, MapPin, Sparkles, Menu, X, ArrowRight, AlertTriangle, Radar, MessageCircle, Send, ShieldAlert, User, XCircle } from "lucide-react";
 import { useState } from "react";
 
 type ChatMessage = { role: "user" | "bot" | "system"; text: string; pending?: boolean };
@@ -16,6 +16,21 @@ function Index() {
   ]);
   const [sending, setSending] = useState(false);
   const [parlamentarSelecionado, setParlamentarSelecionado] = useState<string | null>(null);
+
+  // Lista de parlamentares de SC visíveis no painel.
+  // Edite/adicione conforme os nomes que aparecem nos gráficos do Power BI.
+  const parlamentaresSC = [
+    "Julia Zanatta",
+    "Daniel Freitas",
+    "Ana Campagnolo",
+    "Caroline de Toni",
+    "Coronel Zucco",
+    "Fábio Schiochet",
+    "Gilson Marques",
+    "Jorge Goetten",
+    "Pedro Uczai",
+    "Rodrigo Coelho",
+  ];
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -221,6 +236,50 @@ function Index() {
                   <h3 className="text-sm font-semibold tracking-tight">Consultoria de Transparência</h3>
                   <p className="text-xs text-muted-foreground">Pergunte diretamente à base de dados</p>
                 </div>
+              </div>
+              {/* Seletor de Parlamentar (contexto do painel) */}
+              <div className="px-5 py-3 border-b border-border bg-card">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    <User className="h-3.5 w-3.5" />
+                    Parlamentar em foco
+                  </span>
+                  {parlamentarSelecionado && (
+                    <button
+                      type="button"
+                      onClick={() => setParlamentarSelecionado(null)}
+                      className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive transition-colors"
+                    >
+                      <XCircle className="h-3.5 w-3.5" />
+                      Limpar
+                    </button>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {parlamentaresSC.map((nome) => {
+                    const ativo = parlamentarSelecionado === nome;
+                    return (
+                      <button
+                        key={nome}
+                        type="button"
+                        onClick={() => setParlamentarSelecionado(ativo ? null : nome)}
+                        className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${
+                          ativo
+                            ? "bg-primary text-primary-foreground border-primary shadow-soft"
+                            : "bg-secondary/60 text-muted-foreground border-border hover:text-foreground hover:border-primary/40"
+                        }`}
+                      >
+                        {nome}
+                      </button>
+                    );
+                  })}
+                </div>
+                {parlamentarSelecionado && (
+                  <p className="mt-2 text-[11px] text-muted-foreground">
+                    Próximas perguntas serão enviadas com contexto:{" "}
+                    <span className="font-semibold text-foreground">{parlamentarSelecionado}</span>
+                  </p>
+                )}
               </div>
               <div className="flex-1 p-5 space-y-3 min-h-[280px] bg-gradient-to-b from-transparent to-secondary/20">
                 {messages.map((m, i) => {
