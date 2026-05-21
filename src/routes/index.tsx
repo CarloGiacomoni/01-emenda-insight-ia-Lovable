@@ -260,7 +260,7 @@ function Index() {
                       type="button"
                       role="combobox"
                       aria-expanded={parlamentarPopoverOpen}
-                      className="w-full inline-flex items-center justify-between rounded-xl border border-border bg-secariy/60 bg-secondary/60 px-3.5 py-2.5 text-sm font-medium text-foreground hover:border-primary/40 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      className="w-full inline-flex items-center justify-between rounded-xl border border-border bg-secondary/60 px-3.5 py-2.5 text-sm font-medium text-foreground hover:border-primary/40 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
                     >
                       <span className={cn(!parlamentarSelecionado && "text-muted-foreground font-normal")}>
                         {parlamentarSelecionado ?? "Selecionar parlamentar..."}
