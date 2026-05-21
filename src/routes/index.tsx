@@ -74,23 +74,64 @@ function Index() {
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const contentType = res.headers.get("content-type") ?? "";
-      const data = contentType.includes("application/json") ? await res.json() : await res.text();
-      const payload = typeof data === "string" ? null : data;
+      const rawText = await res.text();
+
+      // Tenta extrair um objeto JSON do texto retornado, mesmo se vier
+      // embrulhado em markdown (```json ... ```) ou em array do n8n.
+      const extractJson = (text: string): Record<string, unknown> | null => {
+        const cleaned = text
+          .replace(/```json\s*/gi, "")
+          .replace(/```/g, "")
+          .trim();
+        const tryParse = (s: string): unknown => {
+          try {
+            return JSON.parse(s);
+          } catch {
+            return undefined;
+          }
+        };
+        let parsed: unknown = tryParse(cleaned);
+        if (parsed === undefined) {
+          const start = cleaned.search(/[\{\[]/);
+          const end = Math.max(cleaned.lastIndexOf("}"), cleaned.lastIndexOf("]"));
+          if (start !== -1 && end > start) {
+            parsed = tryParse(cleaned.substring(start, end + 1));
+          }
+        }
+        if (Array.isArray(parsed)) parsed = parsed[0];
+        if (parsed && typeof parsed === "object") {
+          const obj = parsed as Record<string, unknown>;
+          // n8n às vezes embrulha em { json: {...} } ou { data: {...} }
+          if (obj.json && typeof obj.json === "object") return obj.json as Record<string, unknown>;
+          if (obj.data && typeof obj.data === "object" && !("resposta_chat" in obj)) {
+            return obj.data as Record<string, unknown>;
+          }
+          return obj;
+        }
+        return null;
+      };
+
+      const payload = extractJson(rawText);
+      const str = (v: unknown): string | null => (typeof v === "string" ? v : null);
+
       const reply =
-        typeof data === "string"
-          ? data
-          : payload?.resposta_chat ?? payload?.resposta ?? payload?.answer ?? payload?.message ?? payload?.output ?? JSON.stringify(data);
-      if (payload && typeof payload === "object") {
+        str(payload?.resposta_chat) ??
+        str(payload?.resposta) ??
+        str(payload?.answer) ??
+        str(payload?.message) ??
+        str(payload?.output) ??
+        (payload ? "" : rawText);
+
+      if (payload) {
         setRadarCards((prev) => ({
-          anomalia: typeof payload.anomalia === "string" ? payload.anomalia : prev.anomalia,
-          insight: typeof payload.insight === "string" ? payload.insight : prev.insight,
-          monitorando: typeof payload.monitorando === "string" ? payload.monitorando : prev.monitorando,
+          anomalia: str(payload.anomalia) ?? prev.anomalia,
+          insight: str(payload.insight) ?? prev.insight,
+          monitorando: str(payload.monitorando) ?? prev.monitorando,
         }));
       }
       setMessages((prev) => {
         const next = prev.filter((m) => !m.pending);
-        return [...next, { role: "bot", text: String(reply) }];
+        return [...next, { role: "bot", text: reply || "(resposta vazia)" }];
       });
     } catch (err) {
       setMessages((prev) => {
