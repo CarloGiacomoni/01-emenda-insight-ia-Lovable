@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BarChart3, Database, MapPin, Sparkles, Menu, X, ArrowRight, AlertTriangle, Radar, MessageCircle, Send, ShieldAlert, User, XCircle } from "lucide-react";
+import { BarChart3, Database, MapPin, Sparkles, Menu, X, ArrowRight, AlertTriangle, Radar, MessageCircle, Send, ShieldAlert, Check, ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 
 type ChatMessage = { role: "user" | "bot" | "system"; text: string; pending?: boolean };
 
@@ -16,20 +19,29 @@ function Index() {
   ]);
   const [sending, setSending] = useState(false);
   const [parlamentarSelecionado, setParlamentarSelecionado] = useState<string | null>(null);
+  const [parlamentarPopoverOpen, setParlamentarPopoverOpen] = useState(false);
 
-  // Lista de parlamentares de SC visíveis no painel.
-  // Edite/adicione conforme os nomes que aparecem nos gráficos do Power BI.
+  // Espelho exato da base de dados (não alterar capitalização, espaços ou acentos).
   const parlamentaresSC = [
-    "Julia Zanatta",
-    "Daniel Freitas",
-    "Ana Campagnolo",
-    "Caroline de Toni",
-    "Coronel Zucco",
-    "Fábio Schiochet",
-    "Gilson Marques",
-    "Jorge Goetten",
-    "Pedro Uczai",
-    "Rodrigo Coelho",
+    "ANA PAULA LIMA",
+    "CARLOS CHIODINI",
+    "CAROLINE DE TONI",
+    "COBALCHINI",
+    "DANIEL FREITAS",
+    "DANIELA REINEHR",
+    "ESPERIDIAO AMIN",
+    "FABIO SCHIOCHET",
+    "GEOVANIA DE SA",
+    "GILSON MARQUES",
+    "HERMES KLANN",
+    "ISMAEL",
+    "IVETE DA SILVEIRA",
+    "JORGE GOETTEN",
+    "JULIA ZANATTA",
+    "PEDRO UCZAI",
+    "PEZENTI",
+    "RICARDO GUIDI",
+    "ZE TROVAO",
   ];
 
   const handleSend = async (e: React.FormEvent) => {
@@ -46,7 +58,7 @@ function Index() {
     ]);
 
     try {
-      const res = await fetch("https://702c09144dd030.lhr.life/webhook-test/chat-auditoria", {
+      const res = await fetch("https://13dfa8f6624bd8.lhr.life/webhook-test/chat-auditoria", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -239,47 +251,62 @@ function Index() {
               </div>
               {/* Seletor de Parlamentar (contexto do painel) */}
               <div className="px-5 py-3 border-b border-border bg-card">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    <User className="h-3.5 w-3.5" />
-                    Parlamentar em foco
-                  </span>
-                  {parlamentarSelecionado && (
+                <p className="text-[11px] text-muted-foreground/80 italic tracking-wide mb-1.5">
+                  Para investigar com a IA, selecione abaixo o parlamentar que está a analisar no painel
+                </p>
+                <Popover open={parlamentarPopoverOpen} onOpenChange={setParlamentarPopoverOpen}>
+                  <PopoverTrigger asChild>
                     <button
                       type="button"
-                      onClick={() => setParlamentarSelecionado(null)}
-                      className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive transition-colors"
+                      role="combobox"
+                      aria-expanded={parlamentarPopoverOpen}
+                      className="w-full inline-flex items-center justify-between rounded-xl border border-border bg-secondary/60 px-3.5 py-2.5 text-sm font-medium text-foreground hover:border-primary/40 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
                     >
-                      <XCircle className="h-3.5 w-3.5" />
-                      Limpar
+                      <span className={cn(!parlamentarSelecionado && "text-muted-foreground font-normal")}>
+                        {parlamentarSelecionado ?? "Selecionar parlamentar..."}
+                      </span>
+                      <ChevronsUpDown className="h-4 w-4 opacity-50 shrink-0" />
                     </button>
-                  )}
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {parlamentaresSC.map((nome) => {
-                    const ativo = parlamentarSelecionado === nome;
-                    return (
-                      <button
-                        key={nome}
-                        type="button"
-                        onClick={() => setParlamentarSelecionado(ativo ? null : nome)}
-                        className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${
-                          ativo
-                            ? "bg-primary text-primary-foreground border-primary shadow-soft"
-                            : "bg-secondary/60 text-muted-foreground border-border hover:text-foreground hover:border-primary/40"
-                        }`}
-                      >
-                        {nome}
-                      </button>
-                    );
-                  })}
-                </div>
-                {parlamentarSelecionado && (
-                  <p className="mt-2 text-[11px] text-muted-foreground">
-                    Próximas perguntas serão enviadas com contexto:{" "}
-                    <span className="font-semibold text-foreground">{parlamentarSelecionado}</span>
-                  </p>
-                )}
+                  </PopoverTrigger>
+                  <PopoverContent className="w-(--radix-popover-trigger-width) p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder="Buscar parlamentar..." />
+                      <CommandList>
+                        <CommandEmpty>Nenhum parlamentar encontrado.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem
+                            value="__limpar__"
+                            onSelect={() => {
+                              setParlamentarSelecionado(null);
+                              setParlamentarPopoverOpen(false);
+                            }}
+                            className="text-muted-foreground italic"
+                          >
+                            Limpar seleção
+                          </CommandItem>
+                          {parlamentaresSC.map((nome) => (
+                            <CommandItem
+                              key={nome}
+                              value={nome}
+                              onSelect={() => {
+                                setParlamentarSelecionado(nome);
+                                setParlamentarPopoverOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  parlamentarSelecionado === nome ? "opacity-100" : "opacity-0",
+                                )}
+                              />
+                              {nome}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
               <div className="flex-1 p-5 space-y-3 min-h-[280px] bg-gradient-to-b from-transparent to-secondary/20">
                 {messages.map((m, i) => {
