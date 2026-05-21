@@ -20,6 +20,11 @@ function Index() {
   const [sending, setSending] = useState(false);
   const [parlamentarSelecionado, setParlamentarSelecionado] = useState<string | null>(null);
   const [parlamentarPopoverOpen, setParlamentarPopoverOpen] = useState(false);
+  const [radarCards, setRadarCards] = useState<{ anomalia: string | null; insight: string | null; monitorando: string | null }>({
+    anomalia: null,
+    insight: null,
+    monitorando: null,
+  });
 
   // Espelho exato da base de dados (não alterar capitalização, espaços ou acentos).
   const parlamentaresSC = [
@@ -71,10 +76,18 @@ function Index() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const contentType = res.headers.get("content-type") ?? "";
       const data = contentType.includes("application/json") ? await res.json() : await res.text();
+      const payload = typeof data === "string" ? null : data;
       const reply =
         typeof data === "string"
           ? data
-          : data?.resposta ?? data?.answer ?? data?.message ?? data?.output ?? JSON.stringify(data);
+          : payload?.resposta_chat ?? payload?.resposta ?? payload?.answer ?? payload?.message ?? payload?.output ?? JSON.stringify(data);
+      if (payload && typeof payload === "object") {
+        setRadarCards((prev) => ({
+          anomalia: typeof payload.anomalia === "string" ? payload.anomalia : prev.anomalia,
+          insight: typeof payload.insight === "string" ? payload.insight : prev.insight,
+          monitorando: typeof payload.monitorando === "string" ? payload.monitorando : prev.monitorando,
+        }));
+      }
       setMessages((prev) => {
         const next = prev.filter((m) => !m.pending);
         return [...next, { role: "bot", text: String(reply) }];
