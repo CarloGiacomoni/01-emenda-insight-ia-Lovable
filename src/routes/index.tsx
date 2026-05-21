@@ -384,9 +384,9 @@ function Index() {
 
           <div className="grid md:grid-cols-3 gap-5">
             {[
-              { icon: AlertTriangle, tag: "Anomalia", color: "text-destructive", border: "border-destructive/30", bg: "bg-destructive/5" },
-              { icon: ShieldAlert, tag: "Insight", color: "text-chart-4", border: "border-chart-4/30", bg: "bg-chart-4/5" },
-              { icon: Radar, tag: "Monitorando", color: "text-accent", border: "border-accent/30", bg: "bg-accent/5" },
+              { icon: AlertTriangle, tag: "Anomalia", color: "text-destructive", border: "border-destructive/30", bg: "bg-destructive/5", content: radarCards.anomalia },
+              { icon: ShieldAlert, tag: "Insight", color: "text-chart-4", border: "border-chart-4/30", bg: "bg-chart-4/5", content: radarCards.insight },
+              { icon: Radar, tag: "Monitorando", color: "text-accent", border: "border-accent/30", bg: "bg-accent/5", content: radarCards.monitorando },
             ].map((card, i) => (
               <div key={i} className={`relative p-6 rounded-2xl border ${card.border} ${card.bg} backdrop-blur-sm`}>
                 <div className="flex items-center justify-between mb-4">
@@ -399,8 +399,8 @@ function Index() {
                     Ao vivo
                   </span>
                 </div>
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  [Aguardando dados... A IA está varrendo portais de transparência e notícias para identificar possíveis anomalias neste parlamentar/município.]
+                <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                  {card.content ?? "[Aguardando dados... A IA está varrendo portais de transparência e notícias para identificar possíveis anomalias neste parlamentar/município.]"}
                 </p>
               </div>
             ))}
