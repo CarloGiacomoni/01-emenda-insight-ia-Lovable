@@ -20,6 +20,11 @@ function Index() {
   const [sending, setSending] = useState(false);
   const [parlamentarSelecionado, setParlamentarSelecionado] = useState<string | null>(null);
   const [parlamentarPopoverOpen, setParlamentarPopoverOpen] = useState(false);
+  const [radarCards, setRadarCards] = useState<{ anomalia: string | null; insight: string | null; monitorando: string | null }>({
+    anomalia: null,
+    insight: null,
+    monitorando: null,
+  });
 
   // Espelho exato da base de dados (não alterar capitalização, espaços ou acentos).
   const parlamentaresSC = [
@@ -71,10 +76,18 @@ function Index() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const contentType = res.headers.get("content-type") ?? "";
       const data = contentType.includes("application/json") ? await res.json() : await res.text();
+      const payload = typeof data === "string" ? null : data;
       const reply =
         typeof data === "string"
           ? data
-          : data?.resposta ?? data?.answer ?? data?.message ?? data?.output ?? JSON.stringify(data);
+          : payload?.resposta_chat ?? payload?.resposta ?? payload?.answer ?? payload?.message ?? payload?.output ?? JSON.stringify(data);
+      if (payload && typeof payload === "object") {
+        setRadarCards((prev) => ({
+          anomalia: typeof payload.anomalia === "string" ? payload.anomalia : prev.anomalia,
+          insight: typeof payload.insight === "string" ? payload.insight : prev.insight,
+          monitorando: typeof payload.monitorando === "string" ? payload.monitorando : prev.monitorando,
+        }));
+      }
       setMessages((prev) => {
         const next = prev.filter((m) => !m.pending);
         return [...next, { role: "bot", text: String(reply) }];
@@ -371,9 +384,9 @@ function Index() {
 
           <div className="grid md:grid-cols-3 gap-5">
             {[
-              { icon: AlertTriangle, tag: "Anomalia", color: "text-destructive", border: "border-destructive/30", bg: "bg-destructive/5" },
-              { icon: ShieldAlert, tag: "Insight", color: "text-chart-4", border: "border-chart-4/30", bg: "bg-chart-4/5" },
-              { icon: Radar, tag: "Monitorando", color: "text-accent", border: "border-accent/30", bg: "bg-accent/5" },
+              { icon: AlertTriangle, tag: "Anomalia", color: "text-destructive", border: "border-destructive/30", bg: "bg-destructive/5", content: radarCards.anomalia },
+              { icon: ShieldAlert, tag: "Insight", color: "text-chart-4", border: "border-chart-4/30", bg: "bg-chart-4/5", content: radarCards.insight },
+              { icon: Radar, tag: "Monitorando", color: "text-accent", border: "border-accent/30", bg: "bg-accent/5", content: radarCards.monitorando },
             ].map((card, i) => (
               <div key={i} className={`relative p-6 rounded-2xl border ${card.border} ${card.bg} backdrop-blur-sm`}>
                 <div className="flex items-center justify-between mb-4">
@@ -386,8 +399,8 @@ function Index() {
                     Ao vivo
                   </span>
                 </div>
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  [Aguardando dados... A IA está varrendo portais de transparência e notícias para identificar possíveis anomalias neste parlamentar/município.]
+                <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                  {card.content ?? "[Aguardando dados... A IA está varrendo portais de transparência e notícias para identificar possíveis anomalias neste parlamentar/município.]"}
                 </p>
               </div>
             ))}
