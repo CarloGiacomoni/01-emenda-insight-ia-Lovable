@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BarChart3, Database, MapPin, Sparkles, Menu, X, ArrowRight, AlertTriangle, Radar, MessageCircle, Send, ShieldAlert, User, XCircle } from "lucide-react";
+import { BarChart3, Database, MapPin, Sparkles, Menu, X, ArrowRight, AlertTriangle, Radar, MessageCircle, Send, ShieldAlert, Check, ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 
 type ChatMessage = { role: "user" | "bot" | "system"; text: string; pending?: boolean };
 
@@ -16,20 +19,29 @@ function Index() {
   ]);
   const [sending, setSending] = useState(false);
   const [parlamentarSelecionado, setParlamentarSelecionado] = useState<string | null>(null);
+  const [parlamentarPopoverOpen, setParlamentarPopoverOpen] = useState(false);
 
-  // Lista de parlamentares de SC visíveis no painel.
-  // Edite/adicione conforme os nomes que aparecem nos gráficos do Power BI.
+  // Espelho exato da base de dados (não alterar capitalização, espaços ou acentos).
   const parlamentaresSC = [
-    "Julia Zanatta",
-    "Daniel Freitas",
-    "Ana Campagnolo",
-    "Caroline de Toni",
-    "Coronel Zucco",
-    "Fábio Schiochet",
-    "Gilson Marques",
-    "Jorge Goetten",
-    "Pedro Uczai",
-    "Rodrigo Coelho",
+    "ANA PAULA LIMA",
+    "CARLOS CHIODINI",
+    "CAROLINE DE TONI",
+    "COBALCHINI",
+    "DANIEL FREITAS",
+    "DANIELA REINEHR",
+    "ESPERIDIAO AMIN",
+    "FABIO SCHIOCHET",
+    "GEOVANIA DE SA",
+    "GILSON MARQUES",
+    "HERMES KLANN",
+    "ISMAEL",
+    "IVETE DA SILVEIRA",
+    "JORGE GOETTEN",
+    "JULIA ZANATTA",
+    "PEDRO UCZAI",
+    "PEZENTI",
+    "RICARDO GUIDI",
+    "ZE TROVAO",
   ];
 
   const handleSend = async (e: React.FormEvent) => {
@@ -46,7 +58,7 @@ function Index() {
     ]);
 
     try {
-      const res = await fetch("https://702c09144dd030.lhr.life/webhook-test/chat-auditoria", {
+      const res = await fetch("https://13dfa8f6624bd8.lhr.life/webhook-test/chat-auditoria", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
