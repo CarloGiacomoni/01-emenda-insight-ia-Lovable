@@ -32,11 +32,15 @@ export const Route = createRootRoute({
       { title: "Monitor de Emendas - Brasil | Transparência com IA" },
       { name: "description", content: "Portal de transparência que decodifica o destino das emendas parlamentares brasileiras com IA generativa e dashboards interativos." },
       { name: "author", content: "Monitor de Emendas" },
-      { property: "og:title", content: "Monitor de Emendas - Brasil" },
-      { property: "og:description", content: "Transparência inteligente: decodificando o destino das emendas parlamentares com IA Generativa." },
+      { property: "og:title", content: "Monitor de Emendas - Brasil | Transparência com IA" },
+      { property: "og:description", content: "Portal de transparência que decodifica o destino das emendas parlamentares brasileiras com IA generativa e dashboards interativos." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Monitor de Emendas - Brasil | Transparência com IA" },
+      { name: "twitter:description", content: "Portal de transparência que decodifica o destino das emendas parlamentares brasileiras com IA generativa e dashboards interativos." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a98998f1-c919-4ebc-aa69-7f5dd57ecb24/id-preview-3cce0cbd--b3199f77-1190-4d3e-93a2-9404d5686a5d.lovable.app-1779744629078.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a98998f1-c919-4ebc-aa69-7f5dd57ecb24/id-preview-3cce0cbd--b3199f77-1190-4d3e-93a2-9404d5686a5d.lovable.app-1779744629078.png" },
     ],
     links: [
       {
