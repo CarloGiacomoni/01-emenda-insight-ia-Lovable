@@ -391,14 +391,18 @@ function Index() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  disabled={sending}
-                  placeholder="Pergunte sobre uma emenda, parlamentar ou município..."
-                  className="flex-1 bg-secondary/60 border border-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-60"
+                  disabled={!parlamentarSelecionado || sending}
+                  placeholder={
+                    parlamentarSelecionado
+                      ? "Pergunte sobre uma emenda, parlamentar ou município..."
+                      : "Selecione um parlamentar acima para começar..."
+                  }
+                  className="flex-1 bg-secondary/60 border border-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
                 />
                 <button
                   type="submit"
-                  disabled={sending || !input.trim()}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground hover:opacity-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!parlamentarSelecionado || sending || !input.trim()}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground hover:opacity-95 transition disabled:opacity-40 disabled:cursor-not-allowed"
                   aria-label="Enviar"
                 >
                   <Send className="h-4 w-4" />
