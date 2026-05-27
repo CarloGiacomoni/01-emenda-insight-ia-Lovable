@@ -423,7 +423,7 @@ function Index() {
           <div className="text-center max-w-2xl mx-auto mb-10">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Radar de Auditoria</h2>
             <p className="mt-3 text-muted-foreground">
-              O cão de guarda digital: nossa IA varre portais oficiais e notícias em tempo real para sinalizar movimentações suspeitas.
+              O cão de guarda digital: ao consultar os dados com apoio da nossa IA, varremos portais oficiais e notícias em tempo real para identificar e sinalizar, nas caixas abaixo, possíveis movimentações suspeitas.
             </p>
           </div>
 
@@ -497,19 +497,59 @@ function Index() {
         </div>
       </section>
 
+      {/* Sobre o Projeto */}
+      <section id="sobre" className="py-16 md:py-24 bg-surface border-t border-border">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Sobre o Projeto</h2>
+            <p className="mt-3 text-muted-foreground">
+              Uma iniciativa independente de transparência pública que utiliza engenharia de dados e inteligência artificial para democratizar o acesso à informação sobre emendas parlamentares no Brasil.
+            </p>
+          </div>
+          <div className="max-w-3xl mx-auto space-y-8">
+            <div>
+              <h3 className="text-lg font-semibold tracking-tight">Sobre o Desenvolvedor</h3>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                O Emenda Insight IA foi idealizado e arquitetado por{" "}
+                <a
+                  href="https://www.linkedin.com/in/carlo-giacomoni/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:text-primary-glow hover:underline underline-offset-2 transition-colors font-medium"
+                >
+                  Carlo de Souza Giacomoni
+                </a>
+                , Analista de Dados Júnior e graduando em Ciência de Dados pela UNINTER. O projeto nasceu do objetivo de aplicar engenharia de dados em nuvem e IA generativa para facilitar o acesso da população à transparência governamental.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer id="sobre" className="border-t border-border bg-surface">
+      <footer className="border-t border-border bg-background">
         <div className="mx-auto max-w-7xl px-6 py-10">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="flex flex-col items-center gap-6 text-center">
             <div className="flex items-center gap-2 font-bold">
               <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary-glow text-primary-foreground">
                 <BarChart3 className="h-4 w-4" />
               </span>
               <span>Monitor de Emendas</span>
             </div>
-            <p className="text-xs text-muted-foreground max-w-md md:text-right leading-relaxed">
-              Copyright © 2026 Monitor de Emendas.<br />
+            <p className="text-xs text-muted-foreground max-w-md leading-relaxed">
               Dados extraídos via API pública do Portal da Transparência do Governo Federal. Projeto acadêmico/independente.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Copyright © 2026 Monitor de Emendas. Desenvolvido por{" "}
+              <a
+                href="https://www.linkedin.com/in/carlo-giacomoni/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:text-primary-glow hover:underline underline-offset-2 transition-colors font-medium"
+              >
+                Carlo de Souza Giacomoni
+              </a>
+              .
             </p>
           </div>
         </div>
