@@ -423,7 +423,7 @@ function Index() {
           <div className="text-center max-w-2xl mx-auto mb-10">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Radar de Auditoria</h2>
             <p className="mt-3 text-muted-foreground">
-              O cão de guarda digital: nossa IA varre portais oficiais e notícias em tempo real para sinalizar movimentações suspeitas.
+              O cão de guarda digital: ao consultar os dados com apoio da nossa IA, varremos portais oficiais e notícias em tempo real para identificar e sinalizar, nas caixas abaixo, possíveis movimentações suspeitas.
             </p>
           </div>
 
