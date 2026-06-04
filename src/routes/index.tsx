@@ -1,9 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { BarChart3, Database, MapPin, Sparkles, Menu, X, ArrowRight, AlertTriangle, Radar, MessageCircle, Send, ShieldAlert, Check, ChevronsUpDown } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import {
+  ESFERAS_PERMITIDAS,
+  fetchCatalogoUnificado,
+  type CatalogoRow,
+  type EsferaPermitida,
+} from "@/lib/supabaseExternal";
 
 type ChatMessage = { role: "user" | "bot" | "system"; text: string; pending?: boolean };
 
@@ -26,28 +32,54 @@ function Index() {
     monitorando: null,
   });
 
-  // Espelho exato da base de dados (não alterar capitalização, espaços ou acentos).
-  const parlamentaresSC = [
-    "ANA PAULA LIMA",
-    "CARLOS CHIODINI",
-    "CAROLINE DE TONI",
-    "COBALCHINI",
-    "DANIEL FREITAS",
-    "DANIELA REINEHR",
-    "ESPERIDIAO AMIN",
-    "FABIO SCHIOCHET",
-    "GEOVANIA DE SA",
-    "GILSON MARQUES",
-    "HERMES KLANN",
-    "ISMAEL",
-    "IVETE DA SILVEIRA",
-    "JORGE GOETTEN",
-    "JULIA ZANATTA",
-    "PEDRO UCZAI",
-    "PEZENTI",
-    "RICARDO GUIDI",
-    "ZE TROVAO",
-  ];
+  // Catálogo unificado vindo do Supabase (parlamentares + institucional).
+  const [catalogo, setCatalogo] = useState<CatalogoRow[]>([]);
+  const [catalogoLoading, setCatalogoLoading] = useState(true);
+  const [catalogoErro, setCatalogoErro] = useState<string | null>(null);
+
+  // Dropdown 1: esfera. Dropdown 2: nome. O esferaPopover e o nomePopover são independentes.
+  const [esferaSelecionada, setEsferaSelecionada] = useState<EsferaPermitida | null>(null);
+  const [esferaPopoverOpen, setEsferaPopoverOpen] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    fetchCatalogoUnificado()
+      .then((rows) => {
+        if (!active) return;
+        setCatalogo(rows);
+        setCatalogoErro(null);
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        console.error("Falha ao carregar catálogo:", err);
+        setCatalogoErro("Não foi possível carregar o catálogo de parlamentares.");
+      })
+      .finally(() => {
+        if (active) setCatalogoLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Esferas disponíveis: apenas as permitidas no MVP, e somente se houver registros.
+  const esferasDisponiveis = useMemo<EsferaPermitida[]>(() => {
+    const presentes = new Set(catalogo.map((r) => (r.Esfera_Carimbo ?? "").trim()));
+    return ESFERAS_PERMITIDAS.filter((e) => presentes.has(e));
+  }, [catalogo]);
+
+  // Nomes filtrados pela esfera escolhida no Dropdown 1.
+  const nomesFiltrados = useMemo<string[]>(() => {
+    if (!esferaSelecionada) return [];
+    const set = new Set<string>();
+    for (const row of catalogo) {
+      if ((row.Esfera_Carimbo ?? "").trim() === esferaSelecionada) {
+        const nome = (row.Nome_Proponente ?? "").trim();
+        if (nome) set.add(nome);
+      }
+    }
+    return Array.from(set).sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }, [catalogo, esferaSelecionada]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,6 +102,7 @@ function Index() {
           mensagem_usuario: pergunta,
           contexto_painel: {
             parlamentar_selecionado: parlamentarSelecionado,
+            esfera_selecionada: esferaSelecionada,
           },
         }),
       });
@@ -305,19 +338,82 @@ function Index() {
               </div>
               {/* Seletor de Parlamentar (contexto do painel) */}
               <div className="px-5 py-3 border-b border-border bg-card">
-                <p className="text-[11px] text-muted-foreground/80 italic tracking-wide mb-1.5">
-                  Para investigar com a IA, selecione abaixo o parlamentar que está a analisar no painel
+                <p className="text-[11px] text-muted-foreground/80 italic tracking-wide mb-2">
+                  Para investigar com a IA, selecione a esfera e, em seguida, o parlamentar/instituição.
                 </p>
+
+                {/* Dropdown 1 — Esfera / Categoria */}
+                <Popover open={esferaPopoverOpen} onOpenChange={setEsferaPopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      role="combobox"
+                      aria-expanded={esferaPopoverOpen}
+                      disabled={catalogoLoading || !!catalogoErro}
+                      className="w-full inline-flex items-center justify-between rounded-xl border border-border bg-secondary/60 px-3.5 py-2.5 text-sm font-medium text-foreground hover:border-primary/40 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <span className={cn(!esferaSelecionada && "text-muted-foreground font-normal")}>
+                        {catalogoLoading
+                          ? "Carregando catálogo..."
+                          : catalogoErro
+                            ? "Erro ao carregar catálogo"
+                            : (esferaSelecionada ?? "Selecionar esfera / categoria...")}
+                      </span>
+                      <ChevronsUpDown className="h-4 w-4 opacity-50 shrink-0" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-(--radix-popover-trigger-width) p-0" align="start">
+                    <Command>
+                      <CommandList>
+                        <CommandEmpty>Nenhuma esfera disponível.</CommandEmpty>
+                        <CommandGroup>
+                          {esferasDisponiveis.map((esfera) => (
+                            <CommandItem
+                              key={esfera}
+                              value={esfera}
+                              onSelect={() => {
+                                setEsferaSelecionada(esfera);
+                                setParlamentarSelecionado(null);
+                                setEsferaPopoverOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  esferaSelecionada === esfera ? "opacity-100" : "opacity-0",
+                                )}
+                              />
+                              {esfera}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+
+                {/* Faixa de aviso para Ex-Parlamentar / Histórico */}
+                {esferaSelecionada === "Ex-Parlamentar / Histórico" && (
+                  <div className="mt-2 flex items-start gap-2 rounded-lg border border-yellow-400/40 bg-yellow-300/15 px-3 py-2 text-xs font-medium text-yellow-900 dark:text-yellow-200">
+                    <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-yellow-600 dark:text-yellow-300" />
+                    <span>Atenção: Parlamentar sem mandato ativo na atual legislatura.</span>
+                  </div>
+                )}
+
+                {/* Dropdown 2 — Nome do Parlamentar / Instituição */}
                 <Popover open={parlamentarPopoverOpen} onOpenChange={setParlamentarPopoverOpen}>
                   <PopoverTrigger asChild>
                     <button
                       type="button"
                       role="combobox"
                       aria-expanded={parlamentarPopoverOpen}
-                      className="w-full inline-flex items-center justify-between rounded-xl border border-border bg-secondary/60 px-3.5 py-2.5 text-sm font-medium text-foreground hover:border-primary/40 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      disabled={!esferaSelecionada || nomesFiltrados.length === 0}
+                      className="mt-2 w-full inline-flex items-center justify-between rounded-xl border border-border bg-secondary/60 px-3.5 py-2.5 text-sm font-medium text-foreground hover:border-primary/40 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span className={cn(!parlamentarSelecionado && "text-muted-foreground font-normal")}>
-                        {parlamentarSelecionado ?? "Selecionar parlamentar..."}
+                        {!esferaSelecionada
+                          ? "Selecione uma esfera primeiro..."
+                          : (parlamentarSelecionado ?? "Selecionar parlamentar / instituição...")}
                       </span>
                       <ChevronsUpDown className="h-4 w-4 opacity-50 shrink-0" />
                     </button>
@@ -338,7 +434,7 @@ function Index() {
                           >
                             Limpar seleção
                           </CommandItem>
-                          {parlamentaresSC.map((nome) => (
+                          {nomesFiltrados.map((nome) => (
                             <CommandItem
                               key={nome}
                               value={nome}
@@ -361,6 +457,9 @@ function Index() {
                     </Command>
                   </PopoverContent>
                 </Popover>
+                {catalogoErro && (
+                  <p className="mt-2 text-xs text-destructive">{catalogoErro}</p>
+                )}
               </div>
               <div className="flex-1 p-5 space-y-3 min-h-[280px] bg-gradient-to-b from-transparent to-secondary/20">
                 {messages.map((m, i) => {
