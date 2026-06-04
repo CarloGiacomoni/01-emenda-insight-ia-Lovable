@@ -670,23 +670,42 @@ function Index() {
                     Pronto para análise
                   </span>
                 </div>
-                <div className="grid sm:grid-cols-3 gap-3">
-                  {[
-                    { icon: AlertTriangle, tag: "Anomalia", color: "text-destructive", border: "border-destructive/30", bg: "bg-destructive/5", content: radarCards.anomalia },
-                    { icon: ShieldAlert, tag: "Insight", color: "text-chart-4", border: "border-chart-4/30", bg: "bg-chart-4/5", content: radarCards.insight },
-                    { icon: Radar, tag: "Monitorando", color: "text-accent", border: "border-accent/30", bg: "bg-accent/5", content: radarCards.monitorando },
-                  ].map((c, i) => (
-                    <div key={i} className={`p-4 rounded-xl border ${c.border} ${c.bg}`}>
-                      <span className={`inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider ${c.color} mb-2`}>
-                        <c.icon className="h-3.5 w-3.5" />
-                        {c.tag}
+                {(() => {
+                  const styles: Record<NivelAlerta, { icon: typeof AlertTriangle; tag: string; color: string; border: string; bg: string }> = {
+                    anomalia: { icon: AlertTriangle, tag: "Anomalia", color: "text-destructive", border: "border-destructive/30", bg: "bg-destructive/5" },
+                    insight: { icon: ShieldAlert, tag: "Insight", color: "text-chart-4", border: "border-chart-4/30", bg: "bg-chart-4/5" },
+                    monitorando: { icon: Radar, tag: "Monitorando", color: "text-accent", border: "border-accent/30", bg: "bg-accent/5" },
+                  };
+                  if (!dossie || !dossie.nivel_alerta) {
+                    return (
+                      <div className="p-4 rounded-xl border border-border bg-secondary/30">
+                        <p className="text-sm text-muted-foreground/80 italic leading-relaxed">
+                          Aguardando dados... O nível de alerta (Anomalia, Insight ou Monitorando) será definido pela IA.
+                        </p>
+                      </div>
+                    );
+                  }
+                  const s = styles[dossie.nivel_alerta];
+                  const Icon = s.icon;
+                  return (
+                    <div className={`p-5 rounded-xl border ${s.border} ${s.bg}`}>
+                      <span className={`inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider ${s.color} mb-2`}>
+                        <Icon className="h-3.5 w-3.5" />
+                        {s.tag}
                       </span>
-                      <p className="text-xs text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                        {c.content ?? "Aguardando dados..."}
-                      </p>
+                      {dossie.titulo_alerta && (
+                        <h4 className={`text-base font-semibold tracking-tight ${s.color} mb-2`}>
+                          {dossie.titulo_alerta}
+                        </h4>
+                      )}
+                      {dossie.conteudo_analise && (
+                        <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                          {dossie.conteudo_analise}
+                        </p>
+                      )}
                     </div>
-                  ))}
-                </div>
+                  );
+                })()}
               </div>
 
               {/* Card 3 — Fontes e Fatos */}
