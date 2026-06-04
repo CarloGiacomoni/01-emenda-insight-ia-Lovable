@@ -366,9 +366,31 @@ function Index() {
                 />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Chat Investigativo */}
-            <aside className="mx-auto w-full max-w-3xl rounded-3xl bg-card border border-border shadow-elegant overflow-hidden flex flex-col">
+      {/* Radar de Auditoria — Dashboard de Auditoria (Chat + Painel de Resultados) */}
+      <section id="radar" className="py-16 md:py-24" style={{ backgroundColor: "#F9FAFB" }}>
+        <div className="mx-auto max-w-7xl px-6">
+          {/* Cabeçalho movido para cima da área de pesquisa */}
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <Radar className="h-6 w-6 text-accent" />
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-accent/10 text-accent border border-accent/20 uppercase tracking-wider">
+              Beta
+            </span>
+          </div>
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Radar de Auditoria</h2>
+            <p className="mt-3 text-muted-foreground">
+              O cão de guarda digital: ao consultar os dados com apoio da nossa IA, varremos portais oficiais e notícias em tempo real para identificar e sinalizar, nas caixas ao lado, possíveis movimentações suspeitas.
+            </p>
+          </div>
+
+          {/* Grid 2 colunas: Chat (esquerda) + Painel de Resultados (direita) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Coluna Esquerda — Controle da IA */}
+            <aside className="lg:col-span-5 xl:col-span-4 rounded-3xl bg-card border border-border shadow-elegant overflow-hidden flex flex-col">
               <div className="flex items-center gap-3 px-5 py-4 border-b border-border bg-secondary/50">
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary-glow text-primary-foreground">
                   <MessageCircle className="h-4 w-4" />
