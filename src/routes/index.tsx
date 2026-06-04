@@ -43,11 +43,7 @@ function Index() {
   const [sending, setSending] = useState(false);
   const [parlamentarSelecionado, setParlamentarSelecionado] = useState<string | null>(null);
   const [parlamentarPopoverOpen, setParlamentarPopoverOpen] = useState(false);
-  const [radarCards, setRadarCards] = useState<{ anomalia: string | null; insight: string | null; monitorando: string | null }>({
-    anomalia: null,
-    insight: null,
-    monitorando: null,
-  });
+  const [dossie, setDossie] = useState<Dossie | null>(null);
   const [perfil, setPerfil] = useState<PerfilParlamentar | null>(null);
   const [fontes, setFontes] = useState<FonteItem[]>([]);
 
