@@ -171,19 +171,45 @@ function Index() {
         (payload ? "" : rawText);
 
       if (payload) {
-        setRadarCards((prev) => ({
-          anomalia: str(payload.anomalia) ?? prev.anomalia,
-          insight: str(payload.insight) ?? prev.insight,
-          monitorando: str(payload.monitorando) ?? prev.monitorando,
-        }));
+        const dossieRaw = (payload.dossie ?? payload.dossier ?? null) as
+          | Record<string, unknown>
+          | null;
+        if (dossieRaw && typeof dossieRaw === "object") {
+          const nivelRaw = (str(dossieRaw.nivel_alerta) ?? "").trim().toLowerCase();
+          const nivel: NivelAlerta | null =
+            nivelRaw === "anomalia" || nivelRaw === "insight" || nivelRaw === "monitorando"
+              ? nivelRaw
+              : null;
+          setDossie({
+            nivel_alerta: nivel,
+            titulo_alerta: str(dossieRaw.titulo_alerta) ?? str(dossieRaw.titulo),
+            conteudo_analise:
+              str(dossieRaw.conteudo_analise) ?? str(dossieRaw.analise) ?? str(dossieRaw.conteudo),
+          });
+        } else {
+          // Fallback retrocompatível: campos soltos no topo do payload.
+          const anomalia = str(payload.anomalia);
+          const insight = str(payload.insight);
+          const monitorando = str(payload.monitorando);
+          if (anomalia || insight || monitorando) {
+            const nivel: NivelAlerta = anomalia ? "anomalia" : insight ? "insight" : "monitorando";
+            setDossie({
+              nivel_alerta: nivel,
+              titulo_alerta: null,
+              conteudo_analise: anomalia ?? insight ?? monitorando,
+            });
+          }
+        }
         const perfilRaw = (payload.perfil ?? payload.parlamentar ?? null) as
           | Record<string, unknown>
           | null;
         if (perfilRaw && typeof perfilRaw === "object") {
           setPerfil({
-            nome: str(perfilRaw.nome) ?? parlamentarSelecionado,
-            partido: str(perfilRaw.partido),
-            trajetoria: str(perfilRaw.trajetoria) ?? str(perfilRaw.resumo),
+            nome: str(perfilRaw.nome_parlamentar) ?? str(perfilRaw.nome) ?? parlamentarSelecionado,
+            partido: str(perfilRaw.partido_uf) ?? str(perfilRaw.partido),
+            alinhamento_politico: str(perfilRaw.alinhamento_politico) ?? str(perfilRaw.alinhamento),
+            trajetoria:
+              str(perfilRaw.resumo_trajetoria) ?? str(perfilRaw.trajetoria) ?? str(perfilRaw.resumo),
             ultima_votacao: str(perfilRaw.ultima_votacao) ?? str(perfilRaw.votacao),
           });
         }
@@ -195,8 +221,9 @@ function Index() {
             else if (f && typeof f === "object") {
               const obj = f as Record<string, unknown>;
               items.push({
-                titulo: str(obj.titulo) ?? str(obj.title) ?? str(obj.url),
-                url: str(obj.url) ?? str(obj.link),
+                titulo:
+                  str(obj.veiculo) ?? str(obj.titulo) ?? str(obj.title) ?? str(obj.link) ?? str(obj.url),
+                url: str(obj.link) ?? str(obj.url),
               });
             }
           }
