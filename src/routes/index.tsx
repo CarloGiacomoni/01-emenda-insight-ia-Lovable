@@ -338,19 +338,82 @@ function Index() {
               </div>
               {/* Seletor de Parlamentar (contexto do painel) */}
               <div className="px-5 py-3 border-b border-border bg-card">
-                <p className="text-[11px] text-muted-foreground/80 italic tracking-wide mb-1.5">
-                  Para investigar com a IA, selecione abaixo o parlamentar que está a analisar no painel
+                <p className="text-[11px] text-muted-foreground/80 italic tracking-wide mb-2">
+                  Para investigar com a IA, selecione a esfera e, em seguida, o parlamentar/instituição.
                 </p>
+
+                {/* Dropdown 1 — Esfera / Categoria */}
+                <Popover open={esferaPopoverOpen} onOpenChange={setEsferaPopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      role="combobox"
+                      aria-expanded={esferaPopoverOpen}
+                      disabled={catalogoLoading || !!catalogoErro}
+                      className="w-full inline-flex items-center justify-between rounded-xl border border-border bg-secondary/60 px-3.5 py-2.5 text-sm font-medium text-foreground hover:border-primary/40 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <span className={cn(!esferaSelecionada && "text-muted-foreground font-normal")}>
+                        {catalogoLoading
+                          ? "Carregando catálogo..."
+                          : catalogoErro
+                            ? "Erro ao carregar catálogo"
+                            : (esferaSelecionada ?? "Selecionar esfera / categoria...")}
+                      </span>
+                      <ChevronsUpDown className="h-4 w-4 opacity-50 shrink-0" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-(--radix-popover-trigger-width) p-0" align="start">
+                    <Command>
+                      <CommandList>
+                        <CommandEmpty>Nenhuma esfera disponível.</CommandEmpty>
+                        <CommandGroup>
+                          {esferasDisponiveis.map((esfera) => (
+                            <CommandItem
+                              key={esfera}
+                              value={esfera}
+                              onSelect={() => {
+                                setEsferaSelecionada(esfera);
+                                setParlamentarSelecionado(null);
+                                setEsferaPopoverOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  esferaSelecionada === esfera ? "opacity-100" : "opacity-0",
+                                )}
+                              />
+                              {esfera}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+
+                {/* Faixa de aviso para Ex-Parlamentar / Histórico */}
+                {esferaSelecionada === "Ex-Parlamentar / Histórico" && (
+                  <div className="mt-2 flex items-start gap-2 rounded-lg border border-yellow-400/40 bg-yellow-300/15 px-3 py-2 text-xs font-medium text-yellow-900 dark:text-yellow-200">
+                    <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-yellow-600 dark:text-yellow-300" />
+                    <span>Atenção: Parlamentar sem mandato ativo na atual legislatura.</span>
+                  </div>
+                )}
+
+                {/* Dropdown 2 — Nome do Parlamentar / Instituição */}
                 <Popover open={parlamentarPopoverOpen} onOpenChange={setParlamentarPopoverOpen}>
                   <PopoverTrigger asChild>
                     <button
                       type="button"
                       role="combobox"
                       aria-expanded={parlamentarPopoverOpen}
-                      className="w-full inline-flex items-center justify-between rounded-xl border border-border bg-secondary/60 px-3.5 py-2.5 text-sm font-medium text-foreground hover:border-primary/40 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      disabled={!esferaSelecionada || nomesFiltrados.length === 0}
+                      className="mt-2 w-full inline-flex items-center justify-between rounded-xl border border-border bg-secondary/60 px-3.5 py-2.5 text-sm font-medium text-foreground hover:border-primary/40 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span className={cn(!parlamentarSelecionado && "text-muted-foreground font-normal")}>
-                        {parlamentarSelecionado ?? "Selecionar parlamentar..."}
+                        {!esferaSelecionada
+                          ? "Selecione uma esfera primeiro..."
+                          : (parlamentarSelecionado ?? "Selecionar parlamentar / instituição...")}
                       </span>
                       <ChevronsUpDown className="h-4 w-4 opacity-50 shrink-0" />
                     </button>
@@ -371,7 +434,7 @@ function Index() {
                           >
                             Limpar seleção
                           </CommandItem>
-                          {parlamentaresSC.map((nome) => (
+                          {nomesFiltrados.map((nome) => (
                             <CommandItem
                               key={nome}
                               value={nome}
@@ -394,6 +457,9 @@ function Index() {
                     </Command>
                   </PopoverContent>
                 </Popover>
+                {catalogoErro && (
+                  <p className="mt-2 text-xs text-destructive">{catalogoErro}</p>
+                )}
               </div>
               <div className="flex-1 p-5 space-y-3 min-h-[280px] bg-gradient-to-b from-transparent to-secondary/20">
                 {messages.map((m, i) => {
