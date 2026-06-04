@@ -572,46 +572,122 @@ function Index() {
                 </button>
               </form>
             </aside>
-          </div>
-        </div>
-      </section>
 
-      {/* Radar de Auditoria */}
-      <section id="radar" className="py-16 md:py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <Radar className="h-6 w-6 text-accent" />
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-accent/10 text-accent border border-accent/20 uppercase tracking-wider">Beta</span>
-          </div>
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Radar de Auditoria</h2>
-            <p className="mt-3 text-muted-foreground">
-              O cão de guarda digital: ao consultar os dados com apoio da nossa IA, varremos portais oficiais e notícias em tempo real para identificar e sinalizar, nas caixas abaixo, possíveis movimentações suspeitas.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-5">
-            {[
-              { icon: AlertTriangle, tag: "Anomalia", color: "text-destructive", border: "border-destructive/30", bg: "bg-destructive/5", content: radarCards.anomalia },
-              { icon: ShieldAlert, tag: "Insight", color: "text-chart-4", border: "border-chart-4/30", bg: "bg-chart-4/5", content: radarCards.insight },
-              { icon: Radar, tag: "Monitorando", color: "text-accent", border: "border-accent/30", bg: "bg-accent/5", content: radarCards.monitorando },
-            ].map((card, i) => (
-              <div key={i} className={`relative p-6 rounded-2xl border ${card.border} ${card.bg} backdrop-blur-sm`}>
+            {/* Coluna Direita — Painel de Resultados */}
+            <div className="lg:col-span-7 xl:col-span-8 space-y-5">
+              {/* Card 1 — Perfil do Parlamentar / Instituição */}
+              <div className="relative p-6 rounded-2xl border border-border bg-white shadow-soft">
                 <div className="flex items-center justify-between mb-4">
-                  <span className={`inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider ${card.color}`}>
-                    <card.icon className="h-4 w-4" />
-                    {card.tag}
+                  <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
+                    <Sparkles className="h-4 w-4" />
+                    Perfil
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                    <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
-                    Ao vivo
+                    <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                    Pronto para análise
                   </span>
                 </div>
-                <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                  {card.content ?? "[Aguardando dados... A IA está varrendo portais de transparência e notícias para identificar possíveis anomalias neste parlamentar/município.]"}
-                </p>
+                {perfil ? (
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                      <h4 className="text-lg font-semibold tracking-tight text-foreground">
+                        {perfil.nome ?? parlamentarSelecionado ?? "—"}
+                      </h4>
+                      {perfil.partido && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-secondary text-xs font-medium text-muted-foreground border border-border">
+                          {perfil.partido}
+                        </span>
+                      )}
+                    </div>
+                    {perfil.trajetoria && (
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Resumo da trajetória</p>
+                        <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{perfil.trajetoria}</p>
+                      </div>
+                    )}
+                    {perfil.ultima_votacao && (
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Última votação de impacto</p>
+                        <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{perfil.ultima_votacao}</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground/80 italic leading-relaxed">
+                    Aguardando dados... Selecione um parlamentar e faça uma pergunta para que a IA monte o perfil aqui.
+                  </p>
+                )}
               </div>
-            ))}
+
+              {/* Card 2 — Dossiê de Auditoria e Alertas */}
+              <div className="relative p-6 rounded-2xl border border-border bg-white shadow-soft">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
+                    <ShieldAlert className="h-4 w-4" />
+                    Dossiê de Auditoria
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                    <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                    Pronto para análise
+                  </span>
+                </div>
+                <div className="grid sm:grid-cols-3 gap-3">
+                  {[
+                    { icon: AlertTriangle, tag: "Anomalia", color: "text-destructive", border: "border-destructive/30", bg: "bg-destructive/5", content: radarCards.anomalia },
+                    { icon: ShieldAlert, tag: "Insight", color: "text-chart-4", border: "border-chart-4/30", bg: "bg-chart-4/5", content: radarCards.insight },
+                    { icon: Radar, tag: "Monitorando", color: "text-accent", border: "border-accent/30", bg: "bg-accent/5", content: radarCards.monitorando },
+                  ].map((c, i) => (
+                    <div key={i} className={`p-4 rounded-xl border ${c.border} ${c.bg}`}>
+                      <span className={`inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider ${c.color} mb-2`}>
+                        <c.icon className="h-3.5 w-3.5" />
+                        {c.tag}
+                      </span>
+                      <p className="text-xs text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                        {c.content ?? "Aguardando dados..."}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Card 3 — Fontes e Fatos */}
+              <div className="relative p-6 rounded-2xl border border-border bg-white shadow-soft">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
+                    <Database className="h-4 w-4" />
+                    Fontes e Fatos
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                    <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                    Pronto para análise
+                  </span>
+                </div>
+                {fontes.length > 0 ? (
+                  <ul className="space-y-2">
+                    {fontes.map((f, i) => (
+                      <li key={i} className="text-sm">
+                        {f.url ? (
+                          <a
+                            href={f.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:text-primary-glow hover:underline underline-offset-2 transition-colors break-words"
+                          >
+                            {f.titulo ?? f.url}
+                          </a>
+                        ) : (
+                          <span className="text-foreground/80">{f.titulo}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-muted-foreground/80 italic leading-relaxed">
+                    Aguardando dados... As fontes oficiais e notícias usadas pela IA aparecerão aqui.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </section>
