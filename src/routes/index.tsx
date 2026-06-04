@@ -16,11 +16,19 @@ type ChatMessage = { role: "user" | "bot" | "system"; text: string; pending?: bo
 type PerfilParlamentar = {
   nome?: string | null;
   partido?: string | null;
+  alinhamento_politico?: string | null;
   trajetoria?: string | null;
   ultima_votacao?: string | null;
 };
 
 type FonteItem = { titulo?: string | null; url?: string | null };
+
+type NivelAlerta = "anomalia" | "insight" | "monitorando";
+type Dossie = {
+  nivel_alerta: NivelAlerta | null;
+  titulo_alerta: string | null;
+  conteudo_analise: string | null;
+};
 
 export const Route = createFileRoute("/")({
   component: Index,
