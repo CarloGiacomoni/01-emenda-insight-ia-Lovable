@@ -13,6 +13,15 @@ import {
 
 type ChatMessage = { role: "user" | "bot" | "system"; text: string; pending?: boolean };
 
+type PerfilParlamentar = {
+  nome?: string | null;
+  partido?: string | null;
+  trajetoria?: string | null;
+  ultima_votacao?: string | null;
+};
+
+type FonteItem = { titulo?: string | null; url?: string | null };
+
 export const Route = createFileRoute("/")({
   component: Index,
 });
@@ -31,6 +40,8 @@ function Index() {
     insight: null,
     monitorando: null,
   });
+  const [perfil, setPerfil] = useState<PerfilParlamentar | null>(null);
+  const [fontes, setFontes] = useState<FonteItem[]>([]);
 
   // Catálogo unificado vindo do Supabase (parlamentares + institucional).
   const [catalogo, setCatalogo] = useState<CatalogoRow[]>([]);
@@ -161,10 +172,41 @@ function Index() {
           insight: str(payload.insight) ?? prev.insight,
           monitorando: str(payload.monitorando) ?? prev.monitorando,
         }));
+        const perfilRaw = (payload.perfil ?? payload.parlamentar ?? null) as
+          | Record<string, unknown>
+          | null;
+        if (perfilRaw && typeof perfilRaw === "object") {
+          setPerfil({
+            nome: str(perfilRaw.nome) ?? parlamentarSelecionado,
+            partido: str(perfilRaw.partido),
+            trajetoria: str(perfilRaw.trajetoria) ?? str(perfilRaw.resumo),
+            ultima_votacao: str(perfilRaw.ultima_votacao) ?? str(perfilRaw.votacao),
+          });
+        }
+        const fontesRaw = payload.fontes ?? payload.sources ?? payload.links;
+        if (Array.isArray(fontesRaw)) {
+          const items: FonteItem[] = [];
+          for (const f of fontesRaw) {
+            if (typeof f === "string") items.push({ titulo: f, url: f });
+            else if (f && typeof f === "object") {
+              const obj = f as Record<string, unknown>;
+              items.push({
+                titulo: str(obj.titulo) ?? str(obj.title) ?? str(obj.url),
+                url: str(obj.url) ?? str(obj.link),
+              });
+            }
+          }
+          if (items.length) setFontes(items);
+        }
       }
       setMessages((prev) => {
         const next = prev.filter((m) => !m.pending);
-        return [...next, { role: "bot", text: reply || "(resposta vazia)" }];
+        const friendly =
+          "Tudo pronto! Cruzei as informações da base de dados oficiais do Governo com as notícias da internet. Os resultados da auditoria estão no painel ao lado.";
+        return [
+          ...next,
+          { role: "bot", text: payload ? friendly : reply || "(resposta vazia)" },
+        ];
       });
     } catch (err) {
       setMessages((prev) => {
