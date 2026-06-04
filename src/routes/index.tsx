@@ -1,9 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { BarChart3, Database, MapPin, Sparkles, Menu, X, ArrowRight, AlertTriangle, Radar, MessageCircle, Send, ShieldAlert, Check, ChevronsUpDown } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import {
+  ESFERAS_PERMITIDAS,
+  fetchCatalogoUnificado,
+  type CatalogoRow,
+  type EsferaPermitida,
+} from "@/lib/supabaseExternal";
 
 type ChatMessage = { role: "user" | "bot" | "system"; text: string; pending?: boolean };
 
@@ -26,28 +32,54 @@ function Index() {
     monitorando: null,
   });
 
-  // Espelho exato da base de dados (não alterar capitalização, espaços ou acentos).
-  const parlamentaresSC = [
-    "ANA PAULA LIMA",
-    "CARLOS CHIODINI",
-    "CAROLINE DE TONI",
-    "COBALCHINI",
-    "DANIEL FREITAS",
-    "DANIELA REINEHR",
-    "ESPERIDIAO AMIN",
-    "FABIO SCHIOCHET",
-    "GEOVANIA DE SA",
-    "GILSON MARQUES",
-    "HERMES KLANN",
-    "ISMAEL",
-    "IVETE DA SILVEIRA",
-    "JORGE GOETTEN",
-    "JULIA ZANATTA",
-    "PEDRO UCZAI",
-    "PEZENTI",
-    "RICARDO GUIDI",
-    "ZE TROVAO",
-  ];
+  // Catálogo unificado vindo do Supabase (parlamentares + institucional).
+  const [catalogo, setCatalogo] = useState<CatalogoRow[]>([]);
+  const [catalogoLoading, setCatalogoLoading] = useState(true);
+  const [catalogoErro, setCatalogoErro] = useState<string | null>(null);
+
+  // Dropdown 1: esfera. Dropdown 2: nome. O esferaPopover e o nomePopover são independentes.
+  const [esferaSelecionada, setEsferaSelecionada] = useState<EsferaPermitida | null>(null);
+  const [esferaPopoverOpen, setEsferaPopoverOpen] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    fetchCatalogoUnificado()
+      .then((rows) => {
+        if (!active) return;
+        setCatalogo(rows);
+        setCatalogoErro(null);
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        console.error("Falha ao carregar catálogo:", err);
+        setCatalogoErro("Não foi possível carregar o catálogo de parlamentares.");
+      })
+      .finally(() => {
+        if (active) setCatalogoLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Esferas disponíveis: apenas as permitidas no MVP, e somente se houver registros.
+  const esferasDisponiveis = useMemo<EsferaPermitida[]>(() => {
+    const presentes = new Set(catalogo.map((r) => (r.Esfera_Carimbo ?? "").trim()));
+    return ESFERAS_PERMITIDAS.filter((e) => presentes.has(e));
+  }, [catalogo]);
+
+  // Nomes filtrados pela esfera escolhida no Dropdown 1.
+  const nomesFiltrados = useMemo<string[]>(() => {
+    if (!esferaSelecionada) return [];
+    const set = new Set<string>();
+    for (const row of catalogo) {
+      if ((row.Esfera_Carimbo ?? "").trim() === esferaSelecionada) {
+        const nome = (row.Nome_Proponente ?? "").trim();
+        if (nome) set.add(nome);
+      }
+    }
+    return Array.from(set).sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }, [catalogo, esferaSelecionada]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,6 +102,7 @@ function Index() {
           mensagem_usuario: pergunta,
           contexto_painel: {
             parlamentar_selecionado: parlamentarSelecionado,
+            esfera_selecionada: esferaSelecionada,
           },
         }),
       });
