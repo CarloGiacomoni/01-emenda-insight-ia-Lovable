@@ -630,6 +630,14 @@ function Index() {
                         </span>
                       )}
                     </div>
+                    {perfil.alinhamento_politico && (
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Alinhamento político</p>
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-semibold">
+                          {perfil.alinhamento_politico}
+                        </span>
+                      </div>
+                    )}
                     {perfil.trajetoria && (
                       <div>
                         <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Resumo da trajetória</p>
