@@ -16,11 +16,19 @@ type ChatMessage = { role: "user" | "bot" | "system"; text: string; pending?: bo
 type PerfilParlamentar = {
   nome?: string | null;
   partido?: string | null;
+  alinhamento_politico?: string | null;
   trajetoria?: string | null;
   ultima_votacao?: string | null;
 };
 
 type FonteItem = { titulo?: string | null; url?: string | null };
+
+type NivelAlerta = "anomalia" | "insight" | "monitorando";
+type Dossie = {
+  nivel_alerta: NivelAlerta | null;
+  titulo_alerta: string | null;
+  conteudo_analise: string | null;
+};
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -35,11 +43,7 @@ function Index() {
   const [sending, setSending] = useState(false);
   const [parlamentarSelecionado, setParlamentarSelecionado] = useState<string | null>(null);
   const [parlamentarPopoverOpen, setParlamentarPopoverOpen] = useState(false);
-  const [radarCards, setRadarCards] = useState<{ anomalia: string | null; insight: string | null; monitorando: string | null }>({
-    anomalia: null,
-    insight: null,
-    monitorando: null,
-  });
+  const [dossie, setDossie] = useState<Dossie | null>(null);
   const [perfil, setPerfil] = useState<PerfilParlamentar | null>(null);
   const [fontes, setFontes] = useState<FonteItem[]>([]);
 
@@ -167,19 +171,45 @@ function Index() {
         (payload ? "" : rawText);
 
       if (payload) {
-        setRadarCards((prev) => ({
-          anomalia: str(payload.anomalia) ?? prev.anomalia,
-          insight: str(payload.insight) ?? prev.insight,
-          monitorando: str(payload.monitorando) ?? prev.monitorando,
-        }));
+        const dossieRaw = (payload.dossie ?? payload.dossier ?? null) as
+          | Record<string, unknown>
+          | null;
+        if (dossieRaw && typeof dossieRaw === "object") {
+          const nivelRaw = (str(dossieRaw.nivel_alerta) ?? "").trim().toLowerCase();
+          const nivel: NivelAlerta | null =
+            nivelRaw === "anomalia" || nivelRaw === "insight" || nivelRaw === "monitorando"
+              ? nivelRaw
+              : null;
+          setDossie({
+            nivel_alerta: nivel,
+            titulo_alerta: str(dossieRaw.titulo_alerta) ?? str(dossieRaw.titulo),
+            conteudo_analise:
+              str(dossieRaw.conteudo_analise) ?? str(dossieRaw.analise) ?? str(dossieRaw.conteudo),
+          });
+        } else {
+          // Fallback retrocompatível: campos soltos no topo do payload.
+          const anomalia = str(payload.anomalia);
+          const insight = str(payload.insight);
+          const monitorando = str(payload.monitorando);
+          if (anomalia || insight || monitorando) {
+            const nivel: NivelAlerta = anomalia ? "anomalia" : insight ? "insight" : "monitorando";
+            setDossie({
+              nivel_alerta: nivel,
+              titulo_alerta: null,
+              conteudo_analise: anomalia ?? insight ?? monitorando,
+            });
+          }
+        }
         const perfilRaw = (payload.perfil ?? payload.parlamentar ?? null) as
           | Record<string, unknown>
           | null;
         if (perfilRaw && typeof perfilRaw === "object") {
           setPerfil({
-            nome: str(perfilRaw.nome) ?? parlamentarSelecionado,
-            partido: str(perfilRaw.partido),
-            trajetoria: str(perfilRaw.trajetoria) ?? str(perfilRaw.resumo),
+            nome: str(perfilRaw.nome_parlamentar) ?? str(perfilRaw.nome) ?? parlamentarSelecionado,
+            partido: str(perfilRaw.partido_uf) ?? str(perfilRaw.partido),
+            alinhamento_politico: str(perfilRaw.alinhamento_politico) ?? str(perfilRaw.alinhamento),
+            trajetoria:
+              str(perfilRaw.resumo_trajetoria) ?? str(perfilRaw.trajetoria) ?? str(perfilRaw.resumo),
             ultima_votacao: str(perfilRaw.ultima_votacao) ?? str(perfilRaw.votacao),
           });
         }
@@ -191,8 +221,9 @@ function Index() {
             else if (f && typeof f === "object") {
               const obj = f as Record<string, unknown>;
               items.push({
-                titulo: str(obj.titulo) ?? str(obj.title) ?? str(obj.url),
-                url: str(obj.url) ?? str(obj.link),
+                titulo:
+                  str(obj.veiculo) ?? str(obj.titulo) ?? str(obj.title) ?? str(obj.link) ?? str(obj.url),
+                url: str(obj.link) ?? str(obj.url),
               });
             }
           }
@@ -599,6 +630,14 @@ function Index() {
                         </span>
                       )}
                     </div>
+                    {perfil.alinhamento_politico && (
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Alinhamento político</p>
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-semibold">
+                          {perfil.alinhamento_politico}
+                        </span>
+                      </div>
+                    )}
                     {perfil.trajetoria && (
                       <div>
                         <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Resumo da trajetória</p>
@@ -631,23 +670,42 @@ function Index() {
                     Pronto para análise
                   </span>
                 </div>
-                <div className="grid sm:grid-cols-3 gap-3">
-                  {[
-                    { icon: AlertTriangle, tag: "Anomalia", color: "text-destructive", border: "border-destructive/30", bg: "bg-destructive/5", content: radarCards.anomalia },
-                    { icon: ShieldAlert, tag: "Insight", color: "text-chart-4", border: "border-chart-4/30", bg: "bg-chart-4/5", content: radarCards.insight },
-                    { icon: Radar, tag: "Monitorando", color: "text-accent", border: "border-accent/30", bg: "bg-accent/5", content: radarCards.monitorando },
-                  ].map((c, i) => (
-                    <div key={i} className={`p-4 rounded-xl border ${c.border} ${c.bg}`}>
-                      <span className={`inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider ${c.color} mb-2`}>
-                        <c.icon className="h-3.5 w-3.5" />
-                        {c.tag}
+                {(() => {
+                  const styles: Record<NivelAlerta, { icon: typeof AlertTriangle; tag: string; color: string; border: string; bg: string }> = {
+                    anomalia: { icon: AlertTriangle, tag: "Anomalia", color: "text-destructive", border: "border-destructive/30", bg: "bg-destructive/5" },
+                    insight: { icon: ShieldAlert, tag: "Insight", color: "text-chart-4", border: "border-chart-4/30", bg: "bg-chart-4/5" },
+                    monitorando: { icon: Radar, tag: "Monitorando", color: "text-accent", border: "border-accent/30", bg: "bg-accent/5" },
+                  };
+                  if (!dossie || !dossie.nivel_alerta) {
+                    return (
+                      <div className="p-4 rounded-xl border border-border bg-secondary/30">
+                        <p className="text-sm text-muted-foreground/80 italic leading-relaxed">
+                          Aguardando dados... O nível de alerta (Anomalia, Insight ou Monitorando) será definido pela IA.
+                        </p>
+                      </div>
+                    );
+                  }
+                  const s = styles[dossie.nivel_alerta];
+                  const Icon = s.icon;
+                  return (
+                    <div className={`p-5 rounded-xl border ${s.border} ${s.bg}`}>
+                      <span className={`inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider ${s.color} mb-2`}>
+                        <Icon className="h-3.5 w-3.5" />
+                        {s.tag}
                       </span>
-                      <p className="text-xs text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                        {c.content ?? "Aguardando dados..."}
-                      </p>
+                      {dossie.titulo_alerta && (
+                        <h4 className={`text-base font-semibold tracking-tight ${s.color} mb-2`}>
+                          {dossie.titulo_alerta}
+                        </h4>
+                      )}
+                      {dossie.conteudo_analise && (
+                        <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                          {dossie.conteudo_analise}
+                        </p>
+                      )}
                     </div>
-                  ))}
-                </div>
+                  );
+                })()}
               </div>
 
               {/* Card 3 — Fontes e Fatos */}
