@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { BarChart3, Database, MapPin, Sparkles, Menu, X, ArrowRight, AlertTriangle, Radar, MessageCircle, Send, ShieldAlert, Check, ChevronsUpDown } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
@@ -13,28 +14,7 @@ import {
 
 type ChatMessage = { role: "user" | "bot" | "system"; text: string; pending?: boolean };
 
-type FonteItem = { titulo: string; url: string | null };
-
 type NivelAlerta = "anomalia" | "insight" | "monitorando";
-
-// Converte o markdown simples "- [Titulo](URL)" (uma fonte por linha) em itens.
-function parseFontes(texto: string): FonteItem[] {
-  const items: FonteItem[] = [];
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-  for (const linha of texto.split(/\r?\n/)) {
-    const limpa = linha.replace(/^\s*[-*]\s*/, "").trim();
-    if (!limpa) continue;
-    let match: RegExpExecArray | null;
-    let achou = false;
-    while ((match = linkRegex.exec(limpa)) !== null) {
-      items.push({ titulo: match[1].trim(), url: match[2].trim() });
-      achou = true;
-    }
-    linkRegex.lastIndex = 0;
-    if (!achou) items.push({ titulo: limpa, url: null });
-  }
-  return items;
-}
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -52,7 +32,7 @@ function Index() {
   const [perfilTexto, setPerfilTexto] = useState<string | null>(null);
   const [dossieTexto, setDossieTexto] = useState<string | null>(null);
   const [nivelAlerta, setNivelAlerta] = useState<NivelAlerta | null>(null);
-  const [fontes, setFontes] = useState<FonteItem[]>([]);
+  const [fontesTexto, setFontesTexto] = useState<string | null>(null);
 
   // Catálogo unificado vindo do Supabase (parlamentares + institucional).
   const [catalogo, setCatalogo] = useState<CatalogoRow[]>([]);
@@ -153,7 +133,9 @@ function Index() {
           : null,
       );
 
-      setFontes(typeof response.fontes === "string" ? parseFontes(response.fontes) : []);
+      setFontesTexto(
+        typeof response.fontes === "string" && response.fontes.trim() ? response.fontes : null,
+      );
 
       setMessages((prev) => {
         const next = prev.filter((m) => !m.pending);
@@ -542,9 +524,9 @@ function Index() {
                   </span>
                 </div>
                 {perfilTexto ? (
-                  <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                    {perfilTexto}
-                  </p>
+                  <div className="prose prose-sm max-w-none text-foreground/80 leading-relaxed prose-strong:text-foreground prose-a:text-primary">
+                    <ReactMarkdown>{perfilTexto}</ReactMarkdown>
+                  </div>
                 ) : (
                   <p className="text-sm text-muted-foreground/80 italic leading-relaxed">
                     Aguardando dados... Selecione um parlamentar e faça uma pergunta para que a IA monte o perfil aqui.
@@ -593,9 +575,9 @@ function Index() {
                           {s.tag}
                         </span>
                       )}
-                      <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                        {dossieTexto}
-                      </p>
+                      <div className="prose prose-sm max-w-none text-foreground/80 leading-relaxed prose-strong:text-foreground prose-a:text-primary">
+                        <ReactMarkdown>{dossieTexto}</ReactMarkdown>
+                      </div>
                     </div>
                   );
                 })()}
@@ -613,25 +595,18 @@ function Index() {
                     Pronto para análise
                   </span>
                 </div>
-                {fontes.length > 0 ? (
-                  <ul className="space-y-2">
-                    {fontes.map((f, i) => (
-                      <li key={i} className="text-sm">
-                        {f.url ? (
-                          <a
-                            href={f.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:text-primary-glow hover:underline underline-offset-2 transition-colors break-words"
-                          >
-                            {f.titulo ?? f.url}
-                          </a>
-                        ) : (
-                          <span className="text-foreground/80">{f.titulo}</span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
+                {fontesTexto ? (
+                  <div className="prose prose-sm max-w-none text-foreground/80 leading-relaxed prose-a:text-primary prose-a:break-words hover:prose-a:underline">
+                    <ReactMarkdown
+                      components={{
+                        a: ({ node: _node, ...props }) => (
+                          <a {...props} target="_blank" rel="noopener noreferrer" />
+                        ),
+                      }}
+                    >
+                      {fontesTexto}
+                    </ReactMarkdown>
+                  </div>
                 ) : (
                   <p className="text-sm text-muted-foreground/80 italic leading-relaxed">
                     Aguardando dados... As fontes oficiais e notícias usadas pela IA aparecerão aqui.
