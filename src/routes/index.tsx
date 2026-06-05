@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { BarChart3, Database, MapPin, Sparkles, Menu, X, ArrowRight, AlertTriangle, Radar, MessageCircle, Send, ShieldAlert, Check, ChevronsUpDown } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
@@ -13,28 +14,7 @@ import {
 
 type ChatMessage = { role: "user" | "bot" | "system"; text: string; pending?: boolean };
 
-type FonteItem = { titulo: string; url: string | null };
-
 type NivelAlerta = "anomalia" | "insight" | "monitorando";
-
-// Converte o markdown simples "- [Titulo](URL)" (uma fonte por linha) em itens.
-function parseFontes(texto: string): FonteItem[] {
-  const items: FonteItem[] = [];
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-  for (const linha of texto.split(/\r?\n/)) {
-    const limpa = linha.replace(/^\s*[-*]\s*/, "").trim();
-    if (!limpa) continue;
-    let match: RegExpExecArray | null;
-    let achou = false;
-    while ((match = linkRegex.exec(limpa)) !== null) {
-      items.push({ titulo: match[1].trim(), url: match[2].trim() });
-      achou = true;
-    }
-    linkRegex.lastIndex = 0;
-    if (!achou) items.push({ titulo: limpa, url: null });
-  }
-  return items;
-}
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -52,7 +32,7 @@ function Index() {
   const [perfilTexto, setPerfilTexto] = useState<string | null>(null);
   const [dossieTexto, setDossieTexto] = useState<string | null>(null);
   const [nivelAlerta, setNivelAlerta] = useState<NivelAlerta | null>(null);
-  const [fontes, setFontes] = useState<FonteItem[]>([]);
+  const [fontesTexto, setFontesTexto] = useState<string | null>(null);
 
   // Catálogo unificado vindo do Supabase (parlamentares + institucional).
   const [catalogo, setCatalogo] = useState<CatalogoRow[]>([]);
@@ -153,7 +133,9 @@ function Index() {
           : null,
       );
 
-      setFontes(typeof response.fontes === "string" ? parseFontes(response.fontes) : []);
+      setFontesTexto(
+        typeof response.fontes === "string" && response.fontes.trim() ? response.fontes : null,
+      );
 
       setMessages((prev) => {
         const next = prev.filter((m) => !m.pending);
