@@ -22,11 +22,27 @@ export type EsferaPermitida = (typeof ESFERAS_PERMITIDAS)[number];
 
 export async function fetchCatalogoUnificado(): Promise<CatalogoRow[]> {
   const cols = "Nome_Proponente, Tipo_Autor, Esfera_Carimbo";
+  // Supabase aplica um teto padrão de 1000 linhas por requisição. Para garantir
+  // que TODOS os parlamentares apareçam no dropdown (inclusive nomes do final
+  // do alfabeto), paginamos manualmente via .range() até esgotar os registros.
+  const PAGE = 1000;
+  const fetchAll = async (table: "catalogo_parlamentares" | "catalogo_institucional") => {
+    const out: CatalogoRow[] = [];
+    for (let from = 0; ; from += PAGE) {
+      const { data, error } = await supabaseCatalogo
+        .from(table)
+        .select(cols)
+        .range(from, from + PAGE - 1);
+      if (error) throw error;
+      const rows = (data ?? []) as CatalogoRow[];
+      out.push(...rows);
+      if (rows.length < PAGE) break;
+    }
+    return out;
+  };
   const [a, b] = await Promise.all([
-    supabaseCatalogo.from("catalogo_parlamentares").select(cols),
-    supabaseCatalogo.from("catalogo_institucional").select(cols),
+    fetchAll("catalogo_parlamentares"),
+    fetchAll("catalogo_institucional"),
   ]);
-  if (a.error) throw a.error;
-  if (b.error) throw b.error;
-  return [...((a.data ?? []) as CatalogoRow[]), ...((b.data ?? []) as CatalogoRow[])];
+  return [...a, ...b];
 }
