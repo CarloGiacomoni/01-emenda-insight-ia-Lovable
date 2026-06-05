@@ -541,39 +541,10 @@ function Index() {
                     Pronto para análise
                   </span>
                 </div>
-                {perfil ? (
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                      <h4 className="text-lg font-semibold tracking-tight text-foreground">
-                        {perfil.nome ?? parlamentarSelecionado ?? "—"}
-                      </h4>
-                      {perfil.partido && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-secondary text-xs font-medium text-muted-foreground border border-border">
-                          {perfil.partido}
-                        </span>
-                      )}
-                    </div>
-                    {perfil.alinhamento_politico && (
-                      <div>
-                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Alinhamento político</p>
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-semibold">
-                          {perfil.alinhamento_politico}
-                        </span>
-                      </div>
-                    )}
-                    {perfil.trajetoria && (
-                      <div>
-                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Resumo da trajetória</p>
-                        <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{perfil.trajetoria}</p>
-                      </div>
-                    )}
-                    {perfil.ultima_votacao && (
-                      <div>
-                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Última votação de impacto</p>
-                        <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{perfil.ultima_votacao}</p>
-                      </div>
-                    )}
-                  </div>
+                {perfilTexto ? (
+                  <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                    {perfilTexto}
+                  </p>
                 ) : (
                   <p className="text-sm text-muted-foreground/80 italic leading-relaxed">
                     Aguardando dados... Selecione um parlamentar e faça uma pergunta para que a IA monte o perfil aqui.
@@ -599,7 +570,7 @@ function Index() {
                     insight: { icon: ShieldAlert, tag: "Insight", color: "text-chart-4", border: "border-chart-4/30", bg: "bg-chart-4/5" },
                     monitorando: { icon: Radar, tag: "Monitorando", color: "text-accent", border: "border-accent/30", bg: "bg-accent/5" },
                   };
-                  if (!dossie || !dossie.nivel_alerta) {
+                  if (!dossieTexto) {
                     return (
                       <div className="p-4 rounded-xl border border-border bg-secondary/30">
                         <p className="text-sm text-muted-foreground/80 italic leading-relaxed">
@@ -608,24 +579,23 @@ function Index() {
                       </div>
                     );
                   }
-                  const s = styles[dossie.nivel_alerta];
-                  const Icon = s.icon;
+                  const s = nivelAlerta ? styles[nivelAlerta] : null;
+                  const Icon = s?.icon;
                   return (
-                    <div className={`p-5 rounded-xl border ${s.border} ${s.bg}`}>
-                      <span className={`inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider ${s.color} mb-2`}>
-                        <Icon className="h-3.5 w-3.5" />
-                        {s.tag}
-                      </span>
-                      {dossie.titulo_alerta && (
-                        <h4 className={`text-base font-semibold tracking-tight ${s.color} mb-2`}>
-                          {dossie.titulo_alerta}
-                        </h4>
+                    <div
+                      className={`p-5 rounded-xl border ${s ? `${s.border} ${s.bg}` : "border-border bg-secondary/30"}`}
+                    >
+                      {s && Icon && (
+                        <span
+                          className={`inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider ${s.color} mb-2`}
+                        >
+                          <Icon className="h-3.5 w-3.5" />
+                          {s.tag}
+                        </span>
                       )}
-                      {dossie.conteudo_analise && (
-                        <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                          {dossie.conteudo_analise}
-                        </p>
-                      )}
+                      <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                        {dossieTexto}
+                      </p>
                     </div>
                   );
                 })()}
