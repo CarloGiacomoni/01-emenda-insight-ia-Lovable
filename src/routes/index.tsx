@@ -13,22 +13,28 @@ import {
 
 type ChatMessage = { role: "user" | "bot" | "system"; text: string; pending?: boolean };
 
-type PerfilParlamentar = {
-  nome?: string | null;
-  partido?: string | null;
-  alinhamento_politico?: string | null;
-  trajetoria?: string | null;
-  ultima_votacao?: string | null;
-};
-
-type FonteItem = { titulo?: string | null; url?: string | null };
+type FonteItem = { titulo: string; url: string | null };
 
 type NivelAlerta = "anomalia" | "insight" | "monitorando";
-type Dossie = {
-  nivel_alerta: NivelAlerta | null;
-  titulo_alerta: string | null;
-  conteudo_analise: string | null;
-};
+
+// Converte o markdown simples "- [Titulo](URL)" (uma fonte por linha) em itens.
+function parseFontes(texto: string): FonteItem[] {
+  const items: FonteItem[] = [];
+  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  for (const linha of texto.split(/\r?\n/)) {
+    const limpa = linha.replace(/^\s*[-*]\s*/, "").trim();
+    if (!limpa) continue;
+    let match: RegExpExecArray | null;
+    let achou = false;
+    while ((match = linkRegex.exec(limpa)) !== null) {
+      items.push({ titulo: match[1].trim(), url: match[2].trim() });
+      achou = true;
+    }
+    linkRegex.lastIndex = 0;
+    if (!achou) items.push({ titulo: limpa, url: null });
+  }
+  return items;
+}
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -43,8 +49,9 @@ function Index() {
   const [sending, setSending] = useState(false);
   const [parlamentarSelecionado, setParlamentarSelecionado] = useState<string | null>(null);
   const [parlamentarPopoverOpen, setParlamentarPopoverOpen] = useState(false);
-  const [dossie, setDossie] = useState<Dossie | null>(null);
-  const [perfil, setPerfil] = useState<PerfilParlamentar | null>(null);
+  const [perfilTexto, setPerfilTexto] = useState<string | null>(null);
+  const [dossieTexto, setDossieTexto] = useState<string | null>(null);
+  const [nivelAlerta, setNivelAlerta] = useState<NivelAlerta | null>(null);
   const [fontes, setFontes] = useState<FonteItem[]>([]);
 
   // Catálogo unificado vindo do Supabase (parlamentares + institucional).
@@ -125,135 +132,34 @@ function Index() {
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const rawText = await res.text();
-
-      // Tenta extrair um objeto JSON do texto retornado, mesmo se vier
-      // embrulhado em markdown (```json ... ```) ou em array do n8n.
-      const extractJson = (text: string): Record<string, unknown> | null => {
-        const cleaned = text
-          .replace(/```json\s*/gi, "")
-          .replace(/```/g, "")
-          .trim();
-        const tryParse = (s: string): unknown => {
-          try {
-            return JSON.parse(s);
-          } catch {
-            return undefined;
-          }
-        };
-        let parsed: unknown = tryParse(cleaned);
-        if (parsed === undefined) {
-          const start = cleaned.search(/[\{\[]/);
-          const end = Math.max(cleaned.lastIndexOf("}"), cleaned.lastIndexOf("]"));
-          if (start !== -1 && end > start) {
-            parsed = tryParse(cleaned.substring(start, end + 1));
-          }
-        }
-        if (Array.isArray(parsed)) parsed = parsed[0];
-        if (parsed && typeof parsed === "object") {
-          const obj = parsed as Record<string, unknown>;
-          // n8n às vezes embrulha em { json: {...} } ou { data: {...} }
-          if (obj.json && typeof obj.json === "object") return obj.json as Record<string, unknown>;
-          if (obj.data && typeof obj.data === "object" && !("resposta_chat" in obj)) {
-            return obj.data as Record<string, unknown>;
-          }
-          // n8n AI Agent costuma devolver { output: "```json {...}```" }.
-          // Se o objeto não tiver perfil/dossie diretamente, tentamos
-          // re-extrair o JSON de um campo de texto interno.
-          if (!("perfil" in obj) && !("dossie" in obj) && !("fontes" in obj)) {
-            for (const key of ["output", "text", "response", "message", "result"]) {
-              const inner = obj[key];
-              if (typeof inner === "string") {
-                const innerParsed = extractJson(inner);
-                if (innerParsed && ("perfil" in innerParsed || "dossie" in innerParsed || "fontes" in innerParsed)) {
-                  return innerParsed;
-                }
-              }
-            }
-          }
-          return obj;
-        }
-        return null;
+      const response = (await res.json()) as {
+        output?: string;
+        perfil?: string;
+        dossie?: string;
+        fontes?: string;
+        nivel_alerta?: string;
       };
 
-      const payload = extractJson(rawText);
-      const str = (v: unknown): string | null => (typeof v === "string" ? v : null);
+      const str = (v: unknown): string | null =>
+        typeof v === "string" && v.trim() ? v : null;
 
-      const reply =
-        str(payload?.resposta_chat) ??
-        str(payload?.resposta) ??
-        str(payload?.answer) ??
-        str(payload?.message) ??
-        str(payload?.output) ??
-        (payload ? "" : rawText);
+      setPerfilTexto(str(response.perfil));
+      setDossieTexto(str(response.dossie));
 
-      if (payload) {
-        const dossieRaw = (payload.dossie ?? payload.dossier ?? null) as
-          | Record<string, unknown>
-          | null;
-        if (dossieRaw && typeof dossieRaw === "object") {
-          const nivelRaw = (str(dossieRaw.nivel_alerta) ?? "").trim().toLowerCase();
-          const nivel: NivelAlerta | null =
-            nivelRaw === "anomalia" || nivelRaw === "insight" || nivelRaw === "monitorando"
-              ? nivelRaw
-              : null;
-          setDossie({
-            nivel_alerta: nivel,
-            titulo_alerta: str(dossieRaw.titulo_alerta) ?? str(dossieRaw.titulo),
-            conteudo_analise:
-              str(dossieRaw.conteudo_analise) ?? str(dossieRaw.analise) ?? str(dossieRaw.conteudo),
-          });
-        } else {
-          // Fallback retrocompatível: campos soltos no topo do payload.
-          const anomalia = str(payload.anomalia);
-          const insight = str(payload.insight);
-          const monitorando = str(payload.monitorando);
-          if (anomalia || insight || monitorando) {
-            const nivel: NivelAlerta = anomalia ? "anomalia" : insight ? "insight" : "monitorando";
-            setDossie({
-              nivel_alerta: nivel,
-              titulo_alerta: null,
-              conteudo_analise: anomalia ?? insight ?? monitorando,
-            });
-          }
-        }
-        const perfilRaw = (payload.perfil ?? payload.parlamentar ?? null) as
-          | Record<string, unknown>
-          | null;
-        if (perfilRaw && typeof perfilRaw === "object") {
-          setPerfil({
-            nome: str(perfilRaw.nome_parlamentar) ?? str(perfilRaw.nome) ?? parlamentarSelecionado,
-            partido: str(perfilRaw.partido_uf) ?? str(perfilRaw.partido),
-            alinhamento_politico: str(perfilRaw.alinhamento_politico) ?? str(perfilRaw.alinhamento),
-            trajetoria:
-              str(perfilRaw.resumo_trajetoria) ?? str(perfilRaw.trajetoria) ?? str(perfilRaw.resumo),
-            ultima_votacao: str(perfilRaw.ultima_votacao) ?? str(perfilRaw.votacao),
-          });
-        }
-        const fontesRaw = payload.fontes ?? payload.sources ?? payload.links;
-        if (Array.isArray(fontesRaw)) {
-          const items: FonteItem[] = [];
-          for (const f of fontesRaw) {
-            if (typeof f === "string") items.push({ titulo: f, url: f });
-            else if (f && typeof f === "object") {
-              const obj = f as Record<string, unknown>;
-              items.push({
-                titulo:
-                  str(obj.veiculo) ?? str(obj.titulo) ?? str(obj.title) ?? str(obj.link) ?? str(obj.url),
-                url: str(obj.link) ?? str(obj.url),
-              });
-            }
-          }
-          if (items.length) setFontes(items);
-        }
-      }
+      const nivelRaw = (response.nivel_alerta ?? "").trim().toLowerCase();
+      setNivelAlerta(
+        nivelRaw === "anomalia" || nivelRaw === "insight" || nivelRaw === "monitorando"
+          ? (nivelRaw as NivelAlerta)
+          : null,
+      );
+
+      setFontes(typeof response.fontes === "string" ? parseFontes(response.fontes) : []);
+
       setMessages((prev) => {
         const next = prev.filter((m) => !m.pending);
-        const friendly =
-          "Tudo pronto! Cruzei as informações da base de dados oficiais do Governo com as notícias da internet. Os resultados da auditoria estão no painel ao lado.";
         return [
           ...next,
-          { role: "bot", text: payload ? friendly : reply || "(resposta vazia)" },
+          { role: "bot", text: str(response.output) ?? "(resposta vazia)" },
         ];
       });
     } catch (err) {
@@ -635,39 +541,10 @@ function Index() {
                     Pronto para análise
                   </span>
                 </div>
-                {perfil ? (
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                      <h4 className="text-lg font-semibold tracking-tight text-foreground">
-                        {perfil.nome ?? parlamentarSelecionado ?? "—"}
-                      </h4>
-                      {perfil.partido && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-secondary text-xs font-medium text-muted-foreground border border-border">
-                          {perfil.partido}
-                        </span>
-                      )}
-                    </div>
-                    {perfil.alinhamento_politico && (
-                      <div>
-                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Alinhamento político</p>
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-semibold">
-                          {perfil.alinhamento_politico}
-                        </span>
-                      </div>
-                    )}
-                    {perfil.trajetoria && (
-                      <div>
-                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Resumo da trajetória</p>
-                        <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{perfil.trajetoria}</p>
-                      </div>
-                    )}
-                    {perfil.ultima_votacao && (
-                      <div>
-                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Última votação de impacto</p>
-                        <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{perfil.ultima_votacao}</p>
-                      </div>
-                    )}
-                  </div>
+                {perfilTexto ? (
+                  <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                    {perfilTexto}
+                  </p>
                 ) : (
                   <p className="text-sm text-muted-foreground/80 italic leading-relaxed">
                     Aguardando dados... Selecione um parlamentar e faça uma pergunta para que a IA monte o perfil aqui.
@@ -693,7 +570,7 @@ function Index() {
                     insight: { icon: ShieldAlert, tag: "Insight", color: "text-chart-4", border: "border-chart-4/30", bg: "bg-chart-4/5" },
                     monitorando: { icon: Radar, tag: "Monitorando", color: "text-accent", border: "border-accent/30", bg: "bg-accent/5" },
                   };
-                  if (!dossie || !dossie.nivel_alerta) {
+                  if (!dossieTexto) {
                     return (
                       <div className="p-4 rounded-xl border border-border bg-secondary/30">
                         <p className="text-sm text-muted-foreground/80 italic leading-relaxed">
@@ -702,24 +579,23 @@ function Index() {
                       </div>
                     );
                   }
-                  const s = styles[dossie.nivel_alerta];
-                  const Icon = s.icon;
+                  const s = nivelAlerta ? styles[nivelAlerta] : null;
+                  const Icon = s?.icon;
                   return (
-                    <div className={`p-5 rounded-xl border ${s.border} ${s.bg}`}>
-                      <span className={`inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider ${s.color} mb-2`}>
-                        <Icon className="h-3.5 w-3.5" />
-                        {s.tag}
-                      </span>
-                      {dossie.titulo_alerta && (
-                        <h4 className={`text-base font-semibold tracking-tight ${s.color} mb-2`}>
-                          {dossie.titulo_alerta}
-                        </h4>
+                    <div
+                      className={`p-5 rounded-xl border ${s ? `${s.border} ${s.bg}` : "border-border bg-secondary/30"}`}
+                    >
+                      {s && Icon && (
+                        <span
+                          className={`inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider ${s.color} mb-2`}
+                        >
+                          <Icon className="h-3.5 w-3.5" />
+                          {s.tag}
+                        </span>
                       )}
-                      {dossie.conteudo_analise && (
-                        <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                          {dossie.conteudo_analise}
-                        </p>
-                      )}
+                      <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                        {dossieTexto}
+                      </p>
                     </div>
                   );
                 })()}
