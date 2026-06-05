@@ -157,6 +157,20 @@ function Index() {
           if (obj.data && typeof obj.data === "object" && !("resposta_chat" in obj)) {
             return obj.data as Record<string, unknown>;
           }
+          // n8n AI Agent costuma devolver { output: "```json {...}```" }.
+          // Se o objeto não tiver perfil/dossie diretamente, tentamos
+          // re-extrair o JSON de um campo de texto interno.
+          if (!("perfil" in obj) && !("dossie" in obj) && !("fontes" in obj)) {
+            for (const key of ["output", "text", "response", "message", "result"]) {
+              const inner = obj[key];
+              if (typeof inner === "string") {
+                const innerParsed = extractJson(inner);
+                if (innerParsed && ("perfil" in innerParsed || "dossie" in innerParsed || "fontes" in innerParsed)) {
+                  return innerParsed;
+                }
+              }
+            }
+          }
           return obj;
         }
         return null;
