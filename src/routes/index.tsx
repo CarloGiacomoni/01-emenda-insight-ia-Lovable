@@ -110,11 +110,14 @@ function Index() {
     ]);
 
     try {
-      const res = await fetch("https://giacomonicdata.com/webhook/chat-auditoria", {
+      const res = await fetch("https://giacomonicdata.com/webhook/pegar-perfil", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           mensagem_usuario: pergunta,
+          parlamentar: parlamentarSelecionado,
+          parlamentar_selecionado: parlamentarSelecionado,
+          esfera: esferaSelecionada,
           contexto_painel: {
             parlamentar_selecionado: parlamentarSelecionado,
             esfera_selecionada: esferaSelecionada,
