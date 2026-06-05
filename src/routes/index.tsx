@@ -524,9 +524,9 @@ function Index() {
                   </span>
                 </div>
                 {perfilTexto ? (
-                  <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                    {perfilTexto}
-                  </p>
+                  <div className="prose prose-sm max-w-none text-foreground/80 leading-relaxed prose-strong:text-foreground prose-a:text-primary">
+                    <ReactMarkdown>{perfilTexto}</ReactMarkdown>
+                  </div>
                 ) : (
                   <p className="text-sm text-muted-foreground/80 italic leading-relaxed">
                     Aguardando dados... Selecione um parlamentar e faça uma pergunta para que a IA monte o perfil aqui.
@@ -575,9 +575,9 @@ function Index() {
                           {s.tag}
                         </span>
                       )}
-                      <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                        {dossieTexto}
-                      </p>
+                      <div className="prose prose-sm max-w-none text-foreground/80 leading-relaxed prose-strong:text-foreground prose-a:text-primary">
+                        <ReactMarkdown>{dossieTexto}</ReactMarkdown>
+                      </div>
                     </div>
                   );
                 })()}
@@ -595,25 +595,18 @@ function Index() {
                     Pronto para análise
                   </span>
                 </div>
-                {fontes.length > 0 ? (
-                  <ul className="space-y-2">
-                    {fontes.map((f, i) => (
-                      <li key={i} className="text-sm">
-                        {f.url ? (
-                          <a
-                            href={f.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:text-primary-glow hover:underline underline-offset-2 transition-colors break-words"
-                          >
-                            {f.titulo ?? f.url}
-                          </a>
-                        ) : (
-                          <span className="text-foreground/80">{f.titulo}</span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
+                {fontesTexto ? (
+                  <div className="prose prose-sm max-w-none text-foreground/80 leading-relaxed prose-a:text-primary prose-a:break-words hover:prose-a:underline">
+                    <ReactMarkdown
+                      components={{
+                        a: ({ node: _node, ...props }) => (
+                          <a {...props} target="_blank" rel="noopener noreferrer" />
+                        ),
+                      }}
+                    >
+                      {fontesTexto}
+                    </ReactMarkdown>
+                  </div>
                 ) : (
                   <p className="text-sm text-muted-foreground/80 italic leading-relaxed">
                     Aguardando dados... As fontes oficiais e notícias usadas pela IA aparecerão aqui.
