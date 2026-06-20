@@ -16,33 +16,34 @@ export type CatalogoRow = {
   Esfera_Carimbo: string | null;
 };
 
-// Esferas permitidas no MVP (exibidas no Dropdown 1).
-export const ESFERAS_PERMITIDAS = ["SC", "Federal / Nacional", "Ex-Parlamentar / Histórico"] as const;
-export type EsferaPermitida = (typeof ESFERAS_PERMITIDAS)[number];
+// 27 UFs do Brasil (Dropdown 1).
+export const UFS_BRASIL = [
+  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
+  "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
+  "RS", "RO", "RR", "SC", "SP", "SE", "TO",
+] as const;
+export type UF = (typeof UFS_BRASIL)[number];
 
-export async function fetchCatalogoUnificado(): Promise<CatalogoRow[]> {
-  const cols = "Nome_Proponente, Tipo_Autor, Esfera_Carimbo";
-  // Supabase aplica um teto padrão de 1000 linhas por requisição. Para garantir
-  // que TODOS os parlamentares apareçam no dropdown (inclusive nomes do final
-  // do alfabeto), paginamos manualmente via .range() até esgotar os registros.
+// Busca os nomes de parlamentares filtrando ESTRITAMENTE por Esfera_Carimbo == uf
+// na tabela catalogo_parlamentares (sem união com catalogo_institucional).
+// Paginação manual via .range() para evitar o teto padrão de 1000 linhas.
+export async function fetchNomesPorUF(uf: string): Promise<string[]> {
   const PAGE = 1000;
-  const fetchAll = async (table: "catalogo_parlamentares" | "catalogo_institucional") => {
-    const out: CatalogoRow[] = [];
-    for (let from = 0; ; from += PAGE) {
-      const { data, error } = await supabaseCatalogo
-        .from(table)
-        .select(cols)
-        .range(from, from + PAGE - 1);
-      if (error) throw error;
-      const rows = (data ?? []) as CatalogoRow[];
-      out.push(...rows);
-      if (rows.length < PAGE) break;
+  const out: string[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabaseCatalogo
+      .from("catalogo_parlamentares")
+      .select("Nome_Proponente, Esfera_Carimbo")
+      .eq("Esfera_Carimbo", uf)
+      .range(from, from + PAGE - 1);
+    if (error) throw error;
+    const rows = (data ?? []) as CatalogoRow[];
+    for (const r of rows) {
+      const nome = (r.Nome_Proponente ?? "").trim();
+      if (nome) out.push(nome);
     }
-    return out;
-  };
-  const [a, b] = await Promise.all([
-    fetchAll("catalogo_parlamentares"),
-    fetchAll("catalogo_institucional"),
-  ]);
-  return [...a, ...b];
+    if (rows.length < PAGE) break;
+  }
+  const set = new Set(out);
+  return Array.from(set).sort((a, b) => a.localeCompare(b, "pt-BR"));
 }
