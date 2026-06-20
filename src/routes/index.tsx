@@ -338,24 +338,31 @@ function Index() {
                       type="button"
                       role="combobox"
                       aria-expanded={esferaPopoverOpen}
-                      disabled={catalogoLoading || !!catalogoErro}
                       className="w-full inline-flex items-center justify-between rounded-xl border border-border bg-secondary/60 px-3.5 py-2.5 text-sm font-medium text-foreground hover:border-primary/40 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span className={cn(!esferaSelecionada && "text-muted-foreground font-normal")}>
-                        {catalogoLoading
-                          ? "Carregando catálogo..."
-                          : catalogoErro
-                            ? "Erro ao carregar catálogo"
-                            : (esferaSelecionada ?? "Selecionar esfera / categoria...")}
+                        {esferaSelecionada ?? "Selecionar Estado (UF)..."}
                       </span>
                       <ChevronsUpDown className="h-4 w-4 opacity-50 shrink-0" />
                     </button>
                   </PopoverTrigger>
                   <PopoverContent className="w-(--radix-popover-trigger-width) p-0" align="start">
                     <Command>
+                      <CommandInput placeholder="Buscar UF..." />
                       <CommandList>
-                        <CommandEmpty>Nenhuma esfera disponível.</CommandEmpty>
+                        <CommandEmpty>Nenhuma UF encontrada.</CommandEmpty>
                         <CommandGroup>
+                          <CommandItem
+                            value="__limpar_uf__"
+                            onSelect={() => {
+                              setEsferaSelecionada(null);
+                              setParlamentarSelecionado(null);
+                              setEsferaPopoverOpen(false);
+                            }}
+                            className="text-muted-foreground italic"
+                          >
+                            Limpar seleção
+                          </CommandItem>
                           {esferasDisponiveis.map((esfera) => (
                             <CommandItem
                               key={esfera}
@@ -381,14 +388,6 @@ function Index() {
                   </PopoverContent>
                 </Popover>
 
-                {/* Faixa de aviso para Ex-Parlamentar / Histórico */}
-                {esferaSelecionada === "Ex-Parlamentar / Histórico" && (
-                  <div className="mt-2 flex items-start gap-2 rounded-lg border border-yellow-400/40 bg-yellow-300/15 px-3 py-2 text-xs font-medium text-yellow-900 dark:text-yellow-200">
-                    <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-yellow-600 dark:text-yellow-300" />
-                    <span>Atenção: Parlamentar sem mandato ativo na atual legislatura.</span>
-                  </div>
-                )}
-
                 {/* Dropdown 2 — Nome do Parlamentar / Instituição */}
                 <Popover open={parlamentarPopoverOpen} onOpenChange={setParlamentarPopoverOpen}>
                   <PopoverTrigger asChild>
@@ -396,13 +395,15 @@ function Index() {
                       type="button"
                       role="combobox"
                       aria-expanded={parlamentarPopoverOpen}
-                      disabled={!esferaSelecionada || nomesFiltrados.length === 0}
+                      disabled={!esferaSelecionada || nomesLoading || nomesFiltrados.length === 0}
                       className="mt-2 w-full inline-flex items-center justify-between rounded-xl border border-border bg-secondary/60 px-3.5 py-2.5 text-sm font-medium text-foreground hover:border-primary/40 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span className={cn(!parlamentarSelecionado && "text-muted-foreground font-normal")}>
                         {!esferaSelecionada
-                          ? "Selecione uma esfera primeiro..."
-                          : (parlamentarSelecionado ?? "Selecionar parlamentar / instituição...")}
+                          ? "Selecione uma UF primeiro..."
+                          : nomesLoading
+                            ? "Carregando parlamentares..."
+                            : (parlamentarSelecionado ?? "Selecionar parlamentar...")}
                       </span>
                       <ChevronsUpDown className="h-4 w-4 opacity-50 shrink-0" />
                     </button>
@@ -446,8 +447,8 @@ function Index() {
                     </Command>
                   </PopoverContent>
                 </Popover>
-                {catalogoErro && (
-                  <p className="mt-2 text-xs text-destructive">{catalogoErro}</p>
+                {nomesErro && (
+                  <p className="mt-2 text-xs text-destructive">{nomesErro}</p>
                 )}
               </div>
               <div className="flex-1 p-5 space-y-3 min-h-[280px] bg-gradient-to-b from-transparent to-secondary/20">
