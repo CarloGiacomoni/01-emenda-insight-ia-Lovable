@@ -6,10 +6,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import {
-  ESFERAS_PERMITIDAS,
-  fetchCatalogoUnificado,
-  type CatalogoRow,
-  type EsferaPermitida,
+  UFS_BRASIL,
+  fetchNomesPorUF,
+  type UF,
 } from "@/lib/supabaseExternal";
 
 type ChatMessage = { role: "user" | "bot" | "system"; text: string; pending?: boolean };
@@ -34,54 +33,44 @@ function Index() {
   const [nivelAlerta, setNivelAlerta] = useState<NivelAlerta | null>(null);
   const [fontesTexto, setFontesTexto] = useState<string | null>(null);
 
-  // Catálogo unificado vindo do Supabase (parlamentares + institucional).
-  const [catalogo, setCatalogo] = useState<CatalogoRow[]>([]);
-  const [catalogoLoading, setCatalogoLoading] = useState(true);
-  const [catalogoErro, setCatalogoErro] = useState<string | null>(null);
-
-  // Dropdown 1: esfera. Dropdown 2: nome. O esferaPopover e o nomePopover são independentes.
-  const [esferaSelecionada, setEsferaSelecionada] = useState<EsferaPermitida | null>(null);
+  // Dropdown 1: UF. Dropdown 2: nome. Carregamento em cascata por UF.
+  const [esferaSelecionada, setEsferaSelecionada] = useState<UF | null>(null);
   const [esferaPopoverOpen, setEsferaPopoverOpen] = useState(false);
+  const [nomesFiltrados, setNomesFiltrados] = useState<string[]>([]);
+  const [nomesLoading, setNomesLoading] = useState(false);
+  const [nomesErro, setNomesErro] = useState<string | null>(null);
 
+  const esferasDisponiveis = useMemo<readonly UF[]>(() => UFS_BRASIL, []);
+
+  // Cascata: ao trocar UF, recarrega Dropdown 2; ao limpar, esvazia e desabilita.
   useEffect(() => {
+    if (!esferaSelecionada) {
+      setNomesFiltrados([]);
+      setNomesErro(null);
+      setNomesLoading(false);
+      return;
+    }
     let active = true;
-    fetchCatalogoUnificado()
-      .then((rows) => {
+    setNomesLoading(true);
+    setNomesErro(null);
+    setNomesFiltrados([]);
+    fetchNomesPorUF(esferaSelecionada)
+      .then((nomes) => {
         if (!active) return;
-        setCatalogo(rows);
-        setCatalogoErro(null);
+        setNomesFiltrados(nomes);
       })
       .catch((err: unknown) => {
         if (!active) return;
-        console.error("Falha ao carregar catálogo:", err);
-        setCatalogoErro("Não foi possível carregar o catálogo de parlamentares.");
+        console.error("Falha ao carregar nomes:", err);
+        setNomesErro("Não foi possível carregar os parlamentares desta UF.");
       })
       .finally(() => {
-        if (active) setCatalogoLoading(false);
+        if (active) setNomesLoading(false);
       });
     return () => {
       active = false;
     };
-  }, []);
-
-  // Esferas disponíveis: apenas as permitidas no MVP, e somente se houver registros.
-  const esferasDisponiveis = useMemo<EsferaPermitida[]>(() => {
-    const presentes = new Set(catalogo.map((r) => (r.Esfera_Carimbo ?? "").trim()));
-    return ESFERAS_PERMITIDAS.filter((e) => presentes.has(e));
-  }, [catalogo]);
-
-  // Nomes filtrados pela esfera escolhida no Dropdown 1.
-  const nomesFiltrados = useMemo<string[]>(() => {
-    if (!esferaSelecionada) return [];
-    const set = new Set<string>();
-    for (const row of catalogo) {
-      if ((row.Esfera_Carimbo ?? "").trim() === esferaSelecionada) {
-        const nome = (row.Nome_Proponente ?? "").trim();
-        if (nome) set.add(nome);
-      }
-    }
-    return Array.from(set).sort((a, b) => a.localeCompare(b, "pt-BR"));
-  }, [catalogo, esferaSelecionada]);
+  }, [esferaSelecionada]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
