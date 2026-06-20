@@ -328,7 +328,7 @@ function Index() {
               {/* Seletor de Parlamentar (contexto do painel) */}
               <div className="px-5 py-3 border-b border-border bg-card">
                 <p className="text-[11px] text-muted-foreground/80 italic tracking-wide mb-2">
-                  Para investigar com a IA, selecione a esfera e, em seguida, o parlamentar/instituição.
+                  Para investigar com a IA, selecione a UF e, em seguida, o parlamentar.
                 </p>
 
                 {/* Dropdown 1 — Esfera / Categoria */}
