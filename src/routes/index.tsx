@@ -290,7 +290,7 @@ function Index() {
       </section>
 
       {/* Divisor de seção entre Dashboard e Radar */}
-      <div className="bg-surface">
+      <div className="bg-surface py-8 md:py-12">
         <div className="mx-auto max-w-7xl px-6">
           <hr className="border-border/70" />
         </div>
