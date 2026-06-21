@@ -23,7 +23,7 @@ function Index() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "bot", text: 'Olá! Faça perguntas como: "Quais emendas chegaram em Florianópolis em 2025?"' },
+    { role: "bot", text: 'Olá! Faça perguntas como: "Qual o perfil deste parlamentar em relação ao envio/alocação/entrega de emendas parlamentares?"' },
   ]);
   const [sending, setSending] = useState(false);
   const [parlamentarSelecionado, setParlamentarSelecionado] = useState<string | null>(null);
@@ -210,12 +210,6 @@ function Index() {
             </div>
             <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.05]">
               Monitor de Emendas Brasil
-              <span className="mt-3 inline-flex items-center gap-2">
-                <span className="inline-flex items-center px-4 py-1.5 rounded-xl bg-gradient-to-r from-primary to-primary-glow text-primary-foreground text-3xl md:text-5xl font-extrabold shadow-elegant">
-                  SC
-                </span>
-                <span className="text-sm md:text-base font-medium text-muted-foreground">Santa Catarina</span>
-              </span>
             </h1>
             <h2 className="mt-6 text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed">
               Transparência com Auditoria Digital: Monitorando o destino das emendas parlamentares com IA e detecção de anomalias.
@@ -294,6 +288,13 @@ function Index() {
           </div>
         </div>
       </section>
+
+      {/* Divisor de seção entre Dashboard e Radar */}
+      <div className="bg-surface py-8 md:py-12">
+        <div className="mx-auto max-w-7xl px-6">
+          <hr className="border-border/70" />
+        </div>
+      </div>
 
       {/* Radar de Auditoria — Dashboard de Auditoria (Chat + Painel de Resultados) */}
       <section id="radar" className="py-16 md:py-24" style={{ backgroundColor: "#F9FAFB" }}>
@@ -510,7 +511,7 @@ function Index() {
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
                     <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-                    Pronto para análise
+                    Ao vivo
                   </span>
                 </div>
                 {perfilTexto ? (
@@ -533,7 +534,7 @@ function Index() {
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
                     <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-                    Pronto para análise
+                    Ao vivo
                   </span>
                 </div>
                 {(() => {
@@ -582,7 +583,7 @@ function Index() {
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
                     <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-                    Pronto para análise
+                    Ao vivo
                   </span>
                 </div>
                 {fontesTexto ? (
