@@ -196,13 +196,13 @@ function Index() {
       </header>
 
       {/* Hero */}
-      <section id="inicio" className="relative overflow-hidden">
+      <section id="inicio" className="relative overflow-hidden py-16 md:py-24 bg-background">
         <div className="absolute inset-0 -z-10 opacity-60">
           <div className="absolute top-20 -right-20 h-80 w-80 rounded-full bg-primary-glow/10 blur-3xl" />
           <div className="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-accent/10 blur-3xl" />
         </div>
 
-        <div className="mx-auto max-w-7xl px-6 py-20 md:py-28 grid md:grid-cols-2 gap-12 items-center">
+        <div className="mx-auto max-w-7xl px-6 grid md:grid-cols-2 gap-12 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary border border-border text-xs font-medium text-muted-foreground mb-6">
               <Sparkles className="h-3.5 w-3.5 text-accent" />
@@ -289,15 +289,8 @@ function Index() {
         </div>
       </section>
 
-      {/* Divisor de seção entre Dashboard e Radar */}
-      <div className="bg-surface py-8 md:py-12">
-        <div className="mx-auto max-w-7xl px-6">
-          <hr className="border-border/70" />
-        </div>
-      </div>
-
       {/* Radar de Auditoria — Dashboard de Auditoria (Chat + Painel de Resultados) */}
-      <section id="radar" className="py-16 md:py-24" style={{ backgroundColor: "#F9FAFB" }}>
+      <section id="radar" className="py-16 md:py-24 bg-background">
         <div className="mx-auto max-w-7xl px-6">
           {/* Cabeçalho movido para cima da área de pesquisa */}
           <div className="flex items-center justify-center gap-3 mb-3">
@@ -610,7 +603,7 @@ function Index() {
       </section>
 
       {/* IA */}
-      <section id="ia" className="py-16 md:py-24">
+      <section id="ia" className="py-16 md:py-24 bg-surface">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary border border-border text-xs font-medium text-muted-foreground mb-4">
@@ -654,7 +647,7 @@ function Index() {
       </section>
 
       {/* Sobre o Projeto */}
-      <section id="sobre" className="py-16 md:py-24 bg-surface border-t border-border">
+      <section id="sobre" className="py-16 md:py-24 bg-background">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center max-w-2xl mx-auto mb-10">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Sobre o Projeto</h2>
@@ -683,7 +676,7 @@ function Index() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-background">
+      <footer className="bg-surface">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <div className="flex flex-col items-center gap-6 text-center">
             <div className="flex items-center gap-2 font-bold">
