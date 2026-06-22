@@ -748,14 +748,14 @@ function Index() {
           <div className="text-center max-w-2xl mx-auto mb-10">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Sobre o Projeto</h2>
             <p className="mt-3 text-muted-foreground">
-              Uma iniciativa independente de transparência pública que utiliza engenharia de dados e inteligência artificial para democratizar o acesso à informação sobre emendas parlamentares no Brasil.
+              Uma iniciativa independente de transparência pública que utiliza engenharia de dados e inteligência artificial para tornar as informações sobre emendas parlamentares mais acessíveis, compreensíveis e úteis para o exercício da cidadania e do controle social.
             </p>
           </div>
           <div className="max-w-3xl mx-auto space-y-8">
             <div>
               <h3 className="text-lg font-semibold tracking-tight">Sobre o Desenvolvedor</h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                O Emenda Insight IA foi idealizado e arquitetado por{" "}
+                Idealizado e arquitetado por{" "}
                 <a
                   href="https://www.linkedin.com/in/carlo-giacomoni/"
                   target="_blank"
@@ -764,7 +764,7 @@ function Index() {
                 >
                   Carlo de Souza Giacomoni
                 </a>
-                , Analista de Dados Júnior e graduando em Ciência de Dados pela UNINTER. O projeto nasceu do objetivo de aplicar engenharia de dados em nuvem e IA generativa para facilitar o acesso da população à transparência governamental.
+                , Analista de Dados e graduando em Ciência de Dados pela UNINTER, o Monitor de Emendas Brasil é uma iniciativa independente que une engenharia de dados em nuvem, inteligência artificial generativa e transparência pública. O projeto foi concebido para transformar dados governamentais complexos em informações acessíveis, compreensíveis e úteis para que qualquer cidadão possa acompanhar e fiscalizar a aplicação dos recursos provenientes de emendas parlamentares.
               </p>
             </div>
           </div>
