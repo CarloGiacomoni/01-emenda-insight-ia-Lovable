@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BarChart3, Database, MapPin, Sparkles, Menu, X, ArrowRight, AlertTriangle, Radar, MessageCircle, Send, ShieldAlert, Check, ChevronsUpDown, Info } from "lucide-react";
+import { BarChart3, Database, MapPin, Sparkles, Menu, X, ArrowRight, AlertTriangle, Radar, MessageCircle, Send, ShieldAlert, Check, ChevronsUpDown, Heart, Copy } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { InfoTooltip } from "@/components/info-tooltip";
 import { cn } from "@/lib/utils";
 import {
   UFS_BRASIL,
@@ -179,9 +181,23 @@ function Index() {
             ))}
           </nav>
 
-          <button className="md:hidden p-2" onClick={() => setOpen(!open)} aria-label="Menu">
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <Dialog>
+              <DialogTrigger asChild>
+                <button
+                  type="button"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-primary/30 text-primary text-sm font-semibold hover:bg-primary hover:text-primary-foreground transition-colors"
+                >
+                  <Heart className="h-4 w-4" />
+                  Apoie o Projeto
+                </button>
+              </DialogTrigger>
+              <SupportPixDialogContent />
+            </Dialog>
+            <button className="md:hidden p-2" onClick={() => setOpen(!open)} aria-label="Menu">
+              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
 
         {open && (
@@ -192,6 +208,19 @@ function Index() {
                   {n.label}
                 </a>
               ))}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    className="sm:hidden inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border border-primary/30 text-primary text-sm font-semibold hover:bg-primary hover:text-primary-foreground transition-colors"
+                  >
+                    <Heart className="h-4 w-4" />
+                    Apoie o Projeto
+                  </button>
+                </DialogTrigger>
+                <SupportPixDialogContent />
+              </Dialog>
             </nav>
           </div>
         )}
@@ -265,24 +294,9 @@ function Index() {
           <div className="text-center max-w-2xl mx-auto mb-10">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight inline-flex items-center justify-center gap-2">
               O Dashboard Interativo
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    className="inline-flex items-center justify-center rounded-full p-1 text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label="Mais informações sobre o Dashboard"
-                  >
-                    <Info className="h-4 w-4" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="top"
-                  align="center"
-                  className="bg-foreground text-background max-w-sm text-left"
-                >
-                  Explore visualmente a distribuição de recursos. O painel interativo permite aplicar filtros por parlamentar, estado, município, ano e partido. Acompanhe a destinação geográfica no mapa, entenda os tipos de entidades beneficiadas (como Administração Pública e ONGs) e analise detalhadamente os objetos das propostas, os destinatários finais e o percentual de execução de cada repasse.
-                </TooltipContent>
-              </Tooltip>
+              <InfoTooltip label="Mais informações sobre o Dashboard" side="top" align="center">
+                Explore visualmente a distribuição de recursos. O painel interativo permite aplicar filtros por parlamentar, estado, município, ano e partido. Acompanhe a destinação geográfica no mapa, entenda os tipos de entidades beneficiadas (como Administração Pública e ONGs) e analise detalhadamente os objetos das propostas, os destinatários finais e o percentual de execução de cada repasse.
+              </InfoTooltip>
             </h2>
             <p className="mt-3 text-muted-foreground">
               Explore visualmente bilhões em emendas parlamentares com filtros por estado, município, autor e área de aplicação.
@@ -339,24 +353,14 @@ function Index() {
                 <div>
                   <h3 className="text-sm font-semibold tracking-tight inline-flex items-center gap-1.5">
                     Consultoria de Transparência
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          className="inline-flex items-center justify-center rounded-full p-0.5 text-muted-foreground hover:text-foreground transition-colors"
-                          aria-label="Mais informações sobre a Consultoria de Transparência"
-                        >
-                          <Info className="h-3.5 w-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent
-                        side="top"
-                        align="start"
-                        className="bg-foreground text-background max-w-sm text-left"
-                      >
-                        Utilize o chat para investigar a alocação de recursos e a conduta parlamentar. Nossa IA formula respostas cruzando, em tempo real, os dados oficiais do governo com as notícias mais recentes do cenário político.
-                      </TooltipContent>
-                    </Tooltip>
+                    <InfoTooltip
+                      label="Mais informações sobre a Consultoria de Transparência"
+                      side="top"
+                      align="start"
+                      iconClassName="h-3.5 w-3.5"
+                    >
+                      Utilize o chat para investigar a alocação de recursos e a conduta parlamentar. Nossa IA formula respostas cruzando, em tempo real, os dados oficiais do governo com as notícias mais recentes do cenário político.
+                    </InfoTooltip>
                   </h3>
                   <p className="text-xs text-muted-foreground">Pergunte diretamente à base de dados</p>
                 </div>
@@ -543,24 +547,14 @@ function Index() {
                   <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
                     <Sparkles className="h-4 w-4" />
                     Perfil
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          className="inline-flex items-center justify-center rounded-full p-0.5 text-muted-foreground hover:text-foreground transition-colors"
-                          aria-label="Mais informações sobre Perfil"
-                        >
-                          <Info className="h-3.5 w-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent
-                        side="top"
-                        align="start"
-                        className="bg-foreground text-background max-w-sm text-left"
-                      >
-                        O perfil é construído dinamicamente pela IA, mapeando a atuação política recente do parlamentar e elaborando um resumo executivo focado no tema da sua pergunta e no histórico de destinação de emendas.
-                      </TooltipContent>
-                    </Tooltip>
+                    <InfoTooltip
+                      label="Mais informações sobre Perfil"
+                      side="top"
+                      align="start"
+                      iconClassName="h-3.5 w-3.5"
+                    >
+                      O perfil é construído dinamicamente pela IA, mapeando a atuação política recente do parlamentar e elaborando um resumo executivo focado no tema da sua pergunta e no histórico de destinação de emendas.
+                    </InfoTooltip>
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
                     <span className="h-1.5 w-1.5 rounded-full bg-accent" />
@@ -584,24 +578,14 @@ function Index() {
                   <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
                     <ShieldAlert className="h-4 w-4" />
                     Dossiê de Auditoria
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          className="inline-flex items-center justify-center rounded-full p-0.5 text-muted-foreground hover:text-foreground transition-colors"
-                          aria-label="Mais informações sobre Dossiê de Auditoria"
-                        >
-                          <Info className="h-3.5 w-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent
-                        side="top"
-                        align="start"
-                        className="bg-foreground text-background max-w-sm text-left"
-                      >
-                        Critérios da IA: Anomalia (indícios de risco, falta de transparência ou dados ocultados pelo governo); Insight (descobertas estratégicas, padrões de comportamento ou foco setorial atípico); Monitorando (fluxo de recursos transparente e dentro da normalidade legislativa).
-                      </TooltipContent>
-                    </Tooltip>
+                    <InfoTooltip
+                      label="Mais informações sobre Dossiê de Auditoria"
+                      side="top"
+                      align="start"
+                      iconClassName="h-3.5 w-3.5"
+                    >
+                      Critérios da IA: Anomalia (indícios de risco, falta de transparência ou dados ocultados pelo governo); Insight (descobertas estratégicas, padrões de comportamento ou foco setorial atípico); Monitorando (fluxo de recursos transparente e dentro da normalidade legislativa).
+                    </InfoTooltip>
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
                     <span className="h-1.5 w-1.5 rounded-full bg-accent" />
@@ -651,24 +635,14 @@ function Index() {
                   <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
                     <Database className="h-4 w-4" />
                     Fontes e Fatos
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          className="inline-flex items-center justify-center rounded-full p-0.5 text-muted-foreground hover:text-foreground transition-colors"
-                          aria-label="Mais informações sobre Fontes e Fatos"
-                        >
-                          <Info className="h-3.5 w-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent
-                        side="top"
-                        align="start"
-                        className="bg-foreground text-background max-w-sm text-left"
-                      >
-                        Base da auditoria digital. Utilizamos os microdados oficiais do Portal da Transparência como verdade factual, enriquecidos por uma varredura automatizada nas manchetes mais recentes e relevantes da imprensa sobre o parlamentar em questão.
-                      </TooltipContent>
-                    </Tooltip>
+                    <InfoTooltip
+                      label="Mais informações sobre Fontes e Fatos"
+                      side="top"
+                      align="start"
+                      iconClassName="h-3.5 w-3.5"
+                    >
+                      Base da auditoria digital. Utilizamos os microdados oficiais do Portal da Transparência como verdade factual, enriquecidos por uma varredura automatizada nas manchetes mais recentes e relevantes da imprensa sobre o parlamentar em questão.
+                    </InfoTooltip>
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
                     <span className="h-1.5 w-1.5 rounded-full bg-accent" />
@@ -762,7 +736,7 @@ function Index() {
                   rel="noopener noreferrer"
                   className="text-primary hover:text-primary-glow hover:underline underline-offset-2 transition-colors font-medium"
                 >
-                  Carlo de Souza Giacomoni
+                  Carlo Giacomoni
                 </a>
                 , Analista de Dados e graduando em Ciência de Dados pela UNINTER, o Monitor de Emendas Brasil é uma iniciativa independente que une engenharia de dados em nuvem, inteligência artificial generativa e transparência pública. O projeto foi concebido para transformar dados governamentais complexos em informações acessíveis, compreensíveis e úteis para que qualquer cidadão possa acompanhar e fiscalizar a aplicação dos recursos provenientes de emendas parlamentares.
               </p>
@@ -792,7 +766,7 @@ function Index() {
                 rel="noopener noreferrer"
                 className="text-primary hover:text-primary-glow hover:underline underline-offset-2 transition-colors font-medium"
               >
-                Carlo de Souza Giacomoni
+                Carlo Giacomoni
               </a>
               .
             </p>
@@ -801,5 +775,38 @@ function Index() {
       </footer>
     </div>
     </TooltipProvider>
+  );
+}
+
+function SupportPixDialogContent() {
+  return (
+    <DialogContent className="sm:max-w-md">
+      <DialogHeader>
+        <DialogTitle className="text-2xl font-bold tracking-tight">
+          Apoie a Transparência
+        </DialogTitle>
+        <DialogDescription className="text-sm text-muted-foreground leading-relaxed">
+          O Monitor de Emendas Brasil é uma ferramenta independente e gratuita. O seu apoio financeiro é fundamental para cobrir os custos de infraestrutura em nuvem (servidores e IA) e garantir que o projeto continue no ar e em constante evolução.
+        </DialogDescription>
+      </DialogHeader>
+      <div className="flex flex-col items-center gap-4 py-2">
+        <div
+          className="flex h-[200px] w-[200px] items-center justify-center rounded-xl bg-slate-100 border border-border text-xs text-muted-foreground"
+          aria-label="QR Code PIX (em breve)"
+        >
+          QR Code PIX
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            alert("Chave copiada");
+          }}
+          className="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-95 transition"
+        >
+          <Copy className="h-4 w-4" />
+          Copiar Chave PIX
+        </button>
+      </div>
+    </DialogContent>
   );
 }
