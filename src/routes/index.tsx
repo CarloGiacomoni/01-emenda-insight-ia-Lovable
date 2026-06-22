@@ -706,5 +706,6 @@ function Index() {
         </div>
       </footer>
     </div>
+    </TooltipProvider>
   );
 }
