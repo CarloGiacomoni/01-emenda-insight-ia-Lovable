@@ -263,7 +263,27 @@ function Index() {
       <section id="dashboard" className="py-16 md:py-24 bg-surface">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">O Dashboard Interativo</h2>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight inline-flex items-center justify-center gap-2">
+              O Dashboard Interativo
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    className="inline-flex items-center justify-center rounded-full p-1 text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label="Mais informações sobre o Dashboard"
+                  >
+                    <Info className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="top"
+                  align="center"
+                  className="bg-foreground text-background max-w-sm text-left"
+                >
+                  Explore visualmente a distribuição de recursos. O painel interativo permite aplicar filtros por parlamentar, estado, município, ano e partido. Acompanhe a destinação geográfica no mapa, entenda os tipos de entidades beneficiadas (como Administração Pública e ONGs) e analise detalhadamente os objetos das propostas, os destinatários finais e o percentual de execução de cada repasse.
+                </TooltipContent>
+              </Tooltip>
+            </h2>
             <p className="mt-3 text-muted-foreground">
               Explore visualmente bilhões em emendas parlamentares com filtros por estado, município, autor e área de aplicação.
             </p>
