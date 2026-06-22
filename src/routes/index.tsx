@@ -777,3 +777,36 @@ function Index() {
     </TooltipProvider>
   );
 }
+
+function SupportPixDialogContent() {
+  return (
+    <DialogContent className="sm:max-w-md">
+      <DialogHeader>
+        <DialogTitle className="text-2xl font-bold tracking-tight">
+          Apoie a Transparência
+        </DialogTitle>
+        <DialogDescription className="text-sm text-muted-foreground leading-relaxed">
+          O Monitor de Emendas Brasil é uma ferramenta independente e gratuita. O seu apoio financeiro é fundamental para cobrir os custos de infraestrutura em nuvem (servidores e IA) e garantir que o projeto continue no ar e em constante evolução.
+        </DialogDescription>
+      </DialogHeader>
+      <div className="flex flex-col items-center gap-4 py-2">
+        <div
+          className="flex h-[200px] w-[200px] items-center justify-center rounded-xl bg-slate-100 border border-border text-xs text-muted-foreground"
+          aria-label="QR Code PIX (em breve)"
+        >
+          QR Code PIX
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            alert("Chave copiada");
+          }}
+          className="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-95 transition"
+        >
+          <Copy className="h-4 w-4" />
+          Copiar Chave PIX
+        </button>
+      </div>
+    </DialogContent>
+  );
+}
