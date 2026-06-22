@@ -543,6 +543,24 @@ function Index() {
                   <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
                     <Sparkles className="h-4 w-4" />
                     Perfil
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="inline-flex items-center justify-center rounded-full p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+                          aria-label="Mais informações sobre Perfil"
+                        >
+                          <Info className="h-3.5 w-3.5" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent
+                        side="top"
+                        align="start"
+                        className="bg-foreground text-background max-w-sm text-left"
+                      >
+                        O perfil é construído dinamicamente pela IA, mapeando a atuação política recente do parlamentar e elaborando um resumo executivo focado no tema da sua pergunta e no histórico de destinação de emendas.
+                      </TooltipContent>
+                    </Tooltip>
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
                     <span className="h-1.5 w-1.5 rounded-full bg-accent" />
@@ -566,6 +584,24 @@ function Index() {
                   <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
                     <ShieldAlert className="h-4 w-4" />
                     Dossiê de Auditoria
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="inline-flex items-center justify-center rounded-full p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+                          aria-label="Mais informações sobre Dossiê de Auditoria"
+                        >
+                          <Info className="h-3.5 w-3.5" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent
+                        side="top"
+                        align="start"
+                        className="bg-foreground text-background max-w-sm text-left"
+                      >
+                        Critérios da IA: Anomalia (indícios de risco, falta de transparência ou dados ocultados pelo governo); Insight (descobertas estratégicas, padrões de comportamento ou foco setorial atípico); Monitorando (fluxo de recursos transparente e dentro da normalidade legislativa).
+                      </TooltipContent>
+                    </Tooltip>
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
                     <span className="h-1.5 w-1.5 rounded-full bg-accent" />
@@ -615,6 +651,24 @@ function Index() {
                   <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
                     <Database className="h-4 w-4" />
                     Fontes e Fatos
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="inline-flex items-center justify-center rounded-full p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+                          aria-label="Mais informações sobre Fontes e Fatos"
+                        >
+                          <Info className="h-3.5 w-3.5" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent
+                        side="top"
+                        align="start"
+                        className="bg-foreground text-background max-w-sm text-left"
+                      >
+                        Base da auditoria digital. Utilizamos os microdados oficiais do Portal da Transparência como verdade factual, enriquecidos por uma varredura automatizada nas manchetes mais recentes e relevantes da imprensa sobre o parlamentar em questão.
+                      </TooltipContent>
+                    </Tooltip>
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
                     <span className="h-1.5 w-1.5 rounded-full bg-accent" />
