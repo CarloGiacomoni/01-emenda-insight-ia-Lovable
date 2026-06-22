@@ -778,7 +778,23 @@ function Index() {
   );
 }
 
+import qrcodePixAsset from "@/assets/qrcode-pix-apoieoprojeto.jpeg.asset.json";
+
 function SupportPixDialogContent() {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    const pixKey =
+      "00020126770014BR.GOV.BCB.PIX013636aac9cf-6425-415d-b9de-5c31496229400215Apoie o Projeto5204000053039865802BR5924CARLO DE SOUZA GIACOMONI6008SAO JOSE622605227DPOpNHySwVxJzJuPfWnY663045062";
+    try {
+      await navigator.clipboard.writeText(pixKey);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback silencioso
+    }
+  };
+
   return (
     <DialogContent className="sm:max-w-md">
       <DialogHeader>
@@ -790,21 +806,27 @@ function SupportPixDialogContent() {
         </DialogDescription>
       </DialogHeader>
       <div className="flex flex-col items-center gap-4 py-2">
-        <div
-          className="flex h-[200px] w-[200px] items-center justify-center rounded-xl bg-slate-100 border border-border text-xs text-muted-foreground"
-          aria-label="QR Code PIX (em breve)"
-        >
-          QR Code PIX
-        </div>
+        <img
+          src={qrcodePixAsset.url}
+          alt="QR Code PIX para apoiar o projeto"
+          className="w-48 h-48 object-contain mx-auto rounded-lg"
+        />
         <button
           type="button"
-          onClick={() => {
-            alert("Chave copiada");
-          }}
+          onClick={handleCopy}
           className="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-95 transition"
         >
-          <Copy className="h-4 w-4" />
-          Copiar Chave PIX
+          {copied ? (
+            <>
+              <Check className="h-4 w-4" />
+              Chave Copiada!
+            </>
+          ) : (
+            <>
+              <Copy className="h-4 w-4" />
+              Copiar Chave PIX
+            </>
+          )}
         </button>
       </div>
     </DialogContent>
