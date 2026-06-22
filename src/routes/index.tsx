@@ -267,24 +267,9 @@ function Index() {
           <div className="text-center max-w-2xl mx-auto mb-10">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight inline-flex items-center justify-center gap-2">
               O Dashboard Interativo
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    className="inline-flex items-center justify-center rounded-full p-1 text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label="Mais informações sobre o Dashboard"
-                  >
-                    <Info className="h-4 w-4" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="top"
-                  align="center"
-                  className="bg-foreground text-background max-w-sm text-left"
-                >
-                  Explore visualmente a distribuição de recursos. O painel interativo permite aplicar filtros por parlamentar, estado, município, ano e partido. Acompanhe a destinação geográfica no mapa, entenda os tipos de entidades beneficiadas (como Administração Pública e ONGs) e analise detalhadamente os objetos das propostas, os destinatários finais e o percentual de execução de cada repasse.
-                </TooltipContent>
-              </Tooltip>
+              <InfoTooltip label="Mais informações sobre o Dashboard" side="top" align="center">
+                Explore visualmente a distribuição de recursos. O painel interativo permite aplicar filtros por parlamentar, estado, município, ano e partido. Acompanhe a destinação geográfica no mapa, entenda os tipos de entidades beneficiadas (como Administração Pública e ONGs) e analise detalhadamente os objetos das propostas, os destinatários finais e o percentual de execução de cada repasse.
+              </InfoTooltip>
             </h2>
             <p className="mt-3 text-muted-foreground">
               Explore visualmente bilhões em emendas parlamentares com filtros por estado, município, autor e área de aplicação.
@@ -341,24 +326,14 @@ function Index() {
                 <div>
                   <h3 className="text-sm font-semibold tracking-tight inline-flex items-center gap-1.5">
                     Consultoria de Transparência
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          className="inline-flex items-center justify-center rounded-full p-0.5 text-muted-foreground hover:text-foreground transition-colors"
-                          aria-label="Mais informações sobre a Consultoria de Transparência"
-                        >
-                          <Info className="h-3.5 w-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent
-                        side="top"
-                        align="start"
-                        className="bg-foreground text-background max-w-sm text-left"
-                      >
-                        Utilize o chat para investigar a alocação de recursos e a conduta parlamentar. Nossa IA formula respostas cruzando, em tempo real, os dados oficiais do governo com as notícias mais recentes do cenário político.
-                      </TooltipContent>
-                    </Tooltip>
+                    <InfoTooltip
+                      label="Mais informações sobre a Consultoria de Transparência"
+                      side="top"
+                      align="start"
+                      iconClassName="h-3.5 w-3.5"
+                    >
+                      Utilize o chat para investigar a alocação de recursos e a conduta parlamentar. Nossa IA formula respostas cruzando, em tempo real, os dados oficiais do governo com as notícias mais recentes do cenário político.
+                    </InfoTooltip>
                   </h3>
                   <p className="text-xs text-muted-foreground">Pergunte diretamente à base de dados</p>
                 </div>
@@ -545,24 +520,14 @@ function Index() {
                   <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
                     <Sparkles className="h-4 w-4" />
                     Perfil
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          className="inline-flex items-center justify-center rounded-full p-0.5 text-muted-foreground hover:text-foreground transition-colors"
-                          aria-label="Mais informações sobre Perfil"
-                        >
-                          <Info className="h-3.5 w-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent
-                        side="top"
-                        align="start"
-                        className="bg-foreground text-background max-w-sm text-left"
-                      >
-                        O perfil é construído dinamicamente pela IA, mapeando a atuação política recente do parlamentar e elaborando um resumo executivo focado no tema da sua pergunta e no histórico de destinação de emendas.
-                      </TooltipContent>
-                    </Tooltip>
+                    <InfoTooltip
+                      label="Mais informações sobre Perfil"
+                      side="top"
+                      align="start"
+                      iconClassName="h-3.5 w-3.5"
+                    >
+                      O perfil é construído dinamicamente pela IA, mapeando a atuação política recente do parlamentar e elaborando um resumo executivo focado no tema da sua pergunta e no histórico de destinação de emendas.
+                    </InfoTooltip>
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
                     <span className="h-1.5 w-1.5 rounded-full bg-accent" />
@@ -586,24 +551,14 @@ function Index() {
                   <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
                     <ShieldAlert className="h-4 w-4" />
                     Dossiê de Auditoria
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          className="inline-flex items-center justify-center rounded-full p-0.5 text-muted-foreground hover:text-foreground transition-colors"
-                          aria-label="Mais informações sobre Dossiê de Auditoria"
-                        >
-                          <Info className="h-3.5 w-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent
-                        side="top"
-                        align="start"
-                        className="bg-foreground text-background max-w-sm text-left"
-                      >
-                        Critérios da IA: Anomalia (indícios de risco, falta de transparência ou dados ocultados pelo governo); Insight (descobertas estratégicas, padrões de comportamento ou foco setorial atípico); Monitorando (fluxo de recursos transparente e dentro da normalidade legislativa).
-                      </TooltipContent>
-                    </Tooltip>
+                    <InfoTooltip
+                      label="Mais informações sobre Dossiê de Auditoria"
+                      side="top"
+                      align="start"
+                      iconClassName="h-3.5 w-3.5"
+                    >
+                      Critérios da IA: Anomalia (indícios de risco, falta de transparência ou dados ocultados pelo governo); Insight (descobertas estratégicas, padrões de comportamento ou foco setorial atípico); Monitorando (fluxo de recursos transparente e dentro da normalidade legislativa).
+                    </InfoTooltip>
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
                     <span className="h-1.5 w-1.5 rounded-full bg-accent" />
@@ -653,24 +608,14 @@ function Index() {
                   <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
                     <Database className="h-4 w-4" />
                     Fontes e Fatos
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          className="inline-flex items-center justify-center rounded-full p-0.5 text-muted-foreground hover:text-foreground transition-colors"
-                          aria-label="Mais informações sobre Fontes e Fatos"
-                        >
-                          <Info className="h-3.5 w-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent
-                        side="top"
-                        align="start"
-                        className="bg-foreground text-background max-w-sm text-left"
-                      >
-                        Base da auditoria digital. Utilizamos os microdados oficiais do Portal da Transparência como verdade factual, enriquecidos por uma varredura automatizada nas manchetes mais recentes e relevantes da imprensa sobre o parlamentar em questão.
-                      </TooltipContent>
-                    </Tooltip>
+                    <InfoTooltip
+                      label="Mais informações sobre Fontes e Fatos"
+                      side="top"
+                      align="start"
+                      iconClassName="h-3.5 w-3.5"
+                    >
+                      Base da auditoria digital. Utilizamos os microdados oficiais do Portal da Transparência como verdade factual, enriquecidos por uma varredura automatizada nas manchetes mais recentes e relevantes da imprensa sobre o parlamentar em questão.
+                    </InfoTooltip>
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
                     <span className="h-1.5 w-1.5 rounded-full bg-accent" />
