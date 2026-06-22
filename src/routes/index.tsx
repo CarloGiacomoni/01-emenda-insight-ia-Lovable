@@ -337,7 +337,27 @@ function Index() {
                   <MessageCircle className="h-4 w-4" />
                 </span>
                 <div>
-                  <h3 className="text-sm font-semibold tracking-tight">Consultoria de Transparência</h3>
+                  <h3 className="text-sm font-semibold tracking-tight inline-flex items-center gap-1.5">
+                    Consultoria de Transparência
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="inline-flex items-center justify-center rounded-full p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+                          aria-label="Mais informações sobre a Consultoria de Transparência"
+                        >
+                          <Info className="h-3.5 w-3.5" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent
+                        side="top"
+                        align="start"
+                        className="bg-foreground text-background max-w-sm text-left"
+                      >
+                        Utilize o chat para investigar a alocação de recursos e a conduta parlamentar. Nossa IA formula respostas cruzando, em tempo real, os dados oficiais do governo com as notícias mais recentes do cenário político.
+                      </TooltipContent>
+                    </Tooltip>
+                  </h3>
                   <p className="text-xs text-muted-foreground">Pergunte diretamente à base de dados</p>
                 </div>
               </div>
