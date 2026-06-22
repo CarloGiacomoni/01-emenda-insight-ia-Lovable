@@ -736,7 +736,7 @@ function Index() {
                   rel="noopener noreferrer"
                   className="text-primary hover:text-primary-glow hover:underline underline-offset-2 transition-colors font-medium"
                 >
-                  Carlo de Souza Giacomoni
+                  Carlo Giacomoni
                 </a>
                 , Analista de Dados e graduando em Ciência de Dados pela UNINTER, o Monitor de Emendas Brasil é uma iniciativa independente que une engenharia de dados em nuvem, inteligência artificial generativa e transparência pública. O projeto foi concebido para transformar dados governamentais complexos em informações acessíveis, compreensíveis e úteis para que qualquer cidadão possa acompanhar e fiscalizar a aplicação dos recursos provenientes de emendas parlamentares.
               </p>
@@ -766,7 +766,7 @@ function Index() {
                 rel="noopener noreferrer"
                 className="text-primary hover:text-primary-glow hover:underline underline-offset-2 transition-colors font-medium"
               >
-                Carlo de Souza Giacomoni
+                Carlo Giacomoni
               </a>
               .
             </p>
