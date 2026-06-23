@@ -26,7 +26,7 @@ function Index() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "bot", text: 'Olá! Faça perguntas como: "Qual o perfil deste parlamentar em relação ao envio/alocação/entrega de emendas parlamentares?"' },
+    { role: "bot", text: "Olá! Faça perguntas diretas como: 'Qual foi a maior emenda deste parlamentar e para qual cidade?' ou 'Resuma as 3 áreas que mais receberam recursos.'" },
   ]);
   const [sending, setSending] = useState(false);
   const [parlamentarSelecionado, setParlamentarSelecionado] = useState<string | null>(null);
@@ -199,7 +199,7 @@ function Index() {
               <DialogTrigger asChild>
                 <button
                   type="button"
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-primary/30 text-primary text-sm font-semibold hover:bg-primary hover:text-primary-foreground transition-colors"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-primary/30 text-primary text-sm font-semibold hover:bg-primary hover:text-primary-foreground transition-colors touch-manipulation cursor-pointer relative z-50"
                 >
                   <Heart className="h-4 w-4" />
                   Apoie o Projeto
@@ -221,19 +221,18 @@ function Index() {
                   {n.label}
                 </a>
               ))}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <button
-                    type="button"
-                    onClick={() => setOpen(false)}
-                    className="sm:hidden inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border border-primary/30 text-primary text-sm font-semibold hover:bg-primary hover:text-primary-foreground transition-colors"
-                  >
-                    <Heart className="h-4 w-4" />
-                    Apoie o Projeto
-                  </button>
-                </DialogTrigger>
-                <SupportPixDialogContent />
-              </Dialog>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="sm:hidden inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border border-primary/30 text-primary text-sm font-semibold hover:bg-primary hover:text-primary-foreground transition-colors touch-manipulation cursor-pointer relative z-50"
+                    >
+                      <Heart className="h-4 w-4" />
+                      Apoie o Projeto
+                    </button>
+                  </DialogTrigger>
+                  <SupportPixDialogContent />
+                </Dialog>
             </nav>
           </div>
         )}
