@@ -221,19 +221,18 @@ function Index() {
                   {n.label}
                 </a>
               ))}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <button
-                    type="button"
-                    onClick={() => setOpen(false)}
-                    className="sm:hidden inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border border-primary/30 text-primary text-sm font-semibold hover:bg-primary hover:text-primary-foreground transition-colors"
-                  >
-                    <Heart className="h-4 w-4" />
-                    Apoie o Projeto
-                  </button>
-                </DialogTrigger>
-                <SupportPixDialogContent />
-              </Dialog>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="sm:hidden inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border border-primary/30 text-primary text-sm font-semibold hover:bg-primary hover:text-primary-foreground transition-colors touch-manipulation cursor-pointer relative z-50"
+                    >
+                      <Heart className="h-4 w-4" />
+                      Apoie o Projeto
+                    </button>
+                  </DialogTrigger>
+                  <SupportPixDialogContent />
+                </Dialog>
             </nav>
           </div>
         )}
