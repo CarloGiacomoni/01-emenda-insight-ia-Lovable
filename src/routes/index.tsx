@@ -26,7 +26,7 @@ function Index() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "bot", text: 'Olá! Faça perguntas como: "Qual o perfil deste parlamentar em relação ao envio/alocação/entrega de emendas parlamentares?"' },
+    { role: "bot", text: "Olá! Faça perguntas diretas como: 'Qual foi a maior emenda deste parlamentar e para qual cidade?' ou 'Resuma as 3 áreas que mais receberam recursos.'" },
   ]);
   const [sending, setSending] = useState(false);
   const [parlamentarSelecionado, setParlamentarSelecionado] = useState<string | null>(null);
