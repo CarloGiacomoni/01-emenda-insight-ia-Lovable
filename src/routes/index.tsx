@@ -43,6 +43,18 @@ function Index() {
   const [nomesLoading, setNomesLoading] = useState(false);
   const [nomesErro, setNomesErro] = useState<string | null>(null);
 
+  // Session ID estável por visita — usado pela memória de curto prazo do n8n
+  const [sessionId] = useState<string>(() => {
+    try {
+      if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+        return crypto.randomUUID();
+      }
+    } catch {
+      // ignore
+    }
+    return `sess_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+  });
+
   const esferasDisponiveis = useMemo<readonly UF[]>(() => UFS_BRASIL, []);
 
   // Cascata: ao trocar UF, recarrega Dropdown 2; ao limpar, esvazia e desabilita.
@@ -93,6 +105,7 @@ function Index() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          session_id: sessionId,
           mensagem_usuario: pergunta,
           parlamentar: parlamentarSelecionado,
           parlamentar_selecionado: parlamentarSelecionado,
@@ -783,16 +796,57 @@ import qrcodePixAsset from "@/assets/qrcode-pix-apoieoprojeto.jpeg.asset.json";
 function SupportPixDialogContent() {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async () => {
-    const pixKey =
-      "00020126770014BR.GOV.BCB.PIX013636aac9cf-6425-415d-b9de-5c31496229400215Apoie o Projeto5204000053039865802BR5924CARLO DE SOUZA GIACOMONI6008SAO JOSE622605227DPOpNHySwVxJzJuPfWnY663045062";
+  const pixKey =
+    "00020126770014BR.GOV.BCB.PIX013636aac9cf-6425-415d-b9de-5c31496229400215Apoie o Projeto5204000053039865802BR5924CARLO DE SOUZA GIACOMONI6008SAO JOSE622605227DPOpNHySwVxJzJuPfWnY663045062";
+
+  const copyWithFallback = (text: string): boolean => {
     try {
-      await navigator.clipboard.writeText(pixKey);
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.top = "0";
+      ta.style.left = "0";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch {
+      return false;
+    }
+  };
+
+  const triggerCopy = async () => {
+    let ok = false;
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(pixKey);
+        ok = true;
+      }
+    } catch {
+      ok = false;
+    }
+    if (!ok) ok = copyWithFallback(pixKey);
+    if (ok) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Fallback silencioso
     }
+  };
+
+  // Garante disparo confiável no mobile (toque) sem duplicar no desktop
+  const handlePointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (e.pointerType === "touch" || e.pointerType === "pen") {
+      e.preventDefault();
+      void triggerCopy();
+    }
+  };
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    void triggerCopy();
   };
 
   return (
@@ -813,8 +867,9 @@ function SupportPixDialogContent() {
         />
         <button
           type="button"
-          onClick={handleCopy}
-          className="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-95 transition"
+          onClick={handleClick}
+          onPointerUp={handlePointerUp}
+          className="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-95 transition touch-manipulation select-none active:opacity-90"
         >
           {copied ? (
             <>
