@@ -1,6 +1,6 @@
 # 01 - Emenda Insight IA 📊 (Front-end & UI)
 
-🔗 **[CLIQUE AQUI PARA ACESSAR O PAINEL AO VIVO](https://emenda-insight-ia.lovable.app/)**
+🔗 **[CLIQUE AQUI PARA ACESSAR O PAINEL AO VIVO](https://monitor-de-emendas-brasil.lovable.app/)**
 
 O **Emenda Insight IA** é uma plataforma inteligente voltada à transparência governamental e auditoria pública de emendas parlamentares federais. O ecossistema integra engenharia de dados robusta, um painel analítico interativo (Power BI) e um assistente de inteligência artificial generativa (Google Gemini) capaz de realizar cruzamentos financeiros e identificar padrões estratégicos em tempo real.
 
