@@ -197,6 +197,7 @@ function Index() {
           </nav>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Dialog>
               <DialogTrigger asChild>
                 <button
