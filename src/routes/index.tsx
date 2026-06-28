@@ -557,7 +557,7 @@ function Index() {
             {/* Coluna Direita — Painel de Resultados */}
             <div className="lg:col-span-7 xl:col-span-8 space-y-5">
               {/* Card 1 — Perfil do Parlamentar / Instituição */}
-              <div className="relative p-6 rounded-2xl border border-border bg-white shadow-soft">
+              <div className="relative p-6 rounded-2xl border border-border bg-card shadow-soft">
                 <div className="flex items-center justify-between mb-4">
                   <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
                     <Sparkles className="h-4 w-4" />
@@ -588,7 +588,7 @@ function Index() {
               </div>
 
               {/* Card 2 — Dossiê de Auditoria e Alertas */}
-              <div className="relative p-6 rounded-2xl border border-border bg-white shadow-soft">
+              <div className="relative p-6 rounded-2xl border border-border bg-card shadow-soft">
                 <div className="flex items-center justify-between mb-4">
                   <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
                     <ShieldAlert className="h-4 w-4" />
@@ -645,7 +645,7 @@ function Index() {
               </div>
 
               {/* Card 3 — Fontes e Fatos */}
-              <div className="relative p-6 rounded-2xl border border-border bg-white shadow-soft">
+              <div className="relative p-6 rounded-2xl border border-border bg-card shadow-soft">
                 <div className="flex items-center justify-between mb-4">
                   <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
                     <Database className="h-4 w-4" />
