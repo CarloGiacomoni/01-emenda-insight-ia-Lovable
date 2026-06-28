@@ -1,3 +1,4 @@
+// Trigger manual de sincronizacao de backup
 import { createFileRoute } from "@tanstack/react-router";
 import { BarChart3, Database, MapPin, Sparkles, Menu, X, ArrowRight, AlertTriangle, Radar, MessageCircle, Send, ShieldAlert, Check, ChevronsUpDown, Heart, Copy } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
