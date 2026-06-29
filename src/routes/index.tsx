@@ -304,10 +304,10 @@ function Index() {
       </section>
 
       {/* Dashboard */}
-      <section id="dashboard" className="py-16 md:py-24 bg-surface">
+      <section id="dashboard" className="py-16 md:py-24 bg-surface dark:bg-slate-900">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight inline-flex items-center justify-center gap-2">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight inline-flex items-center justify-center gap-2 dark:text-slate-100">
               O Dashboard Interativo
               <InfoTooltip label="Mais informações sobre o Dashboard" side="top" align="center">
                 Explore visualmente a distribuição de recursos. O painel interativo permite aplicar filtros por parlamentar, estado, município, ano e partido. Acompanhe a destinação geográfica no mapa, entenda os tipos de entidades beneficiadas (como Administração Pública e ONGs) e analise detalhadamente os objetos das propostas, os destinatários finais e o percentual de execução de cada repasse.
@@ -351,7 +351,7 @@ function Index() {
             </span>
           </div>
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Radar de Auditoria</h2>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight dark:text-slate-100">Radar de Auditoria</h2>
             <p className="mt-3 text-muted-foreground">
               O cão de guarda digital: ao consultar os dados com apoio da nossa IA, varremos portais oficiais e notícias em tempo real para identificar e sinalizar, nas caixas ao lado, possíveis movimentações suspeitas.
             </p>
@@ -688,14 +688,14 @@ function Index() {
       </section>
 
       {/* IA */}
-      <section id="ia" className="py-16 md:py-24 bg-surface">
+      <section id="ia" className="py-16 md:py-24 bg-surface dark:bg-slate-900">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary border border-border text-xs font-medium text-muted-foreground mb-4">
               <Sparkles className="h-3.5 w-3.5 text-accent" />
               Inteligência Artificial
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Como a IA Generativa Trabalha</h2>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight dark:text-slate-100">Como a IA Generativa Trabalha</h2>
             <p className="mt-3 text-muted-foreground">
               Combinamos dados oficiais com modelos de linguagem para entregar transparência acessível a qualquer cidadão.
             </p>
@@ -735,7 +735,7 @@ function Index() {
       <section id="sobre" className="py-16 md:py-24 bg-background">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Sobre o Projeto</h2>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight dark:text-slate-100">Sobre o Projeto</h2>
             <p className="mt-3 text-muted-foreground">
               Uma iniciativa independente de transparência pública que utiliza engenharia de dados e inteligência artificial para tornar as informações sobre emendas parlamentares mais acessíveis, compreensíveis e úteis para o exercício da cidadania e do controle social.
             </p>
@@ -761,7 +761,7 @@ function Index() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-surface">
+      <footer className="bg-surface dark:bg-slate-900">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <div className="flex flex-col items-center gap-6 text-center">
             <div className="flex items-center gap-2 font-bold">
